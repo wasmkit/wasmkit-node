@@ -1,0 +1,23 @@
+{
+  "name": "wasm2wat",
+  "version": "0.0.0",
+  "description": "Converts web assembly to webassembly text. Written in javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theberge-256/wasm2wat.git"
+  },
+  "keywords": [
+    "wasm",
+    "wat"
+  ],
+  "author": "awt256",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/theberge-256/wasm2wat/issues"
+  },
+  "homepage": "https://github.com/theberge-256/wasm2wat#readme"
+}
