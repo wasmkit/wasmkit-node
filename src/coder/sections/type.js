@@ -1,32 +1,33 @@
 const WASMReader = require('../wasm_reader');
 
 class TypeSectionParser extends WASMReader {
-    parse() {
-        let types = []
-        let numTypes = types.length = this.vu32()
-        for (let i = 0; i < numTypes; i++) {
-            let type = this.readTypeEnc()
-            if (type !== 'func') {
-                types[i] = { type }
-                continue;
-            }
-            let params = []
-            let numParams = params.length = this.vu32();
-            for (let i = 0; i < numParams; i++) {
-                params[i] = this.readTypeEnc()
-            }
-            let results = []
-            let numResults = results.length = this.vu32();
-            if (numResults > 1) return this.parseError('Must have maximum `1` results for each function')
-            for (let i = 0; i < numResults; i++) {
-                results[i] = this.readTypeEnc()
-            }
-            types[i] = { type, params, results }
-        }
-        return {
-            types
-        }
+    constructor(buffer, options = {}) {
+        super(buffer);
+
+        this.options = typeof options !== 'object' ? {} : options;
     }
+    parse(options = this.options) {
+        const types = this.array(() => {
+            const type = this.readTypeEnc();
+            if (type !== 'func') return { type, params: null, results: null };
+
+            const params = this.array(() => this.readTypeEnc());
+
+            // Length of results should always be one, unless multiple results is allowed
+            if (this.buffer[this.at] !== 1 && !options.multiResult) throw new SyntaxError('Only one result per function');
+
+            const results = this.array(() => this.readTypeEnc());
+
+            return {
+                type,
+                params,
+                results
+            }
+        });
+
+        return types;
+    }
+
 }
 
 module.exports = TypeSectionParser;

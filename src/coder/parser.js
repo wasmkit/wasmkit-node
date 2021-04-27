@@ -31,32 +31,39 @@ class Parser extends WASMReader {
         while (this.at < this.size) {
             const id = this.u8();
             const name = SECTIONS[id];
-            if (!SectionParsers[name]) {
+            const bytes = this.byteArray();
+            try {
+                if (!SectionParsers[name]) {
+                    wasm.sections.push({
+                        id,
+                        name,
+                        bytes: bytes,
+                        data: null
+                    });
+                    continue;
+                }
+
+                const parser = new SectionParsers[name](bytes);
+
                 wasm.sections.push({
                     id,
                     name,
-                    bytes: this.byteArray(),
-                    data: null
-                });
-                continue;
+                    bytes: parser.buffer,
+                    data: parser.parse()
+                })
+            } catch (err) {
+                this.parseError(err);
             }
-
-            const parser = new SectionParsers[name](this.byteArray());
-
-            wasm.sections.push({
-                id,
-                name,
-                bytes: parser.buffer,
-                data: parser.parse()
-            })
         }
+
 
         return wasm;
     }
 
-    parseError(msg) {
+    parseError(err) {
+        let msg = err.message || err;
         console.log(chalk.red.bold(msg + "@" + this.at) + "\n");
 
-        throw msg;
+        throw err;
     }
 }
