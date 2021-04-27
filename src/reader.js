@@ -1,3 +1,7 @@
+Object.getPrototypeOf(Uint8Array).prototype.read = function () {
+    return new Reader(this);
+}
+
 class Reader {
     /** @private */
     static convo = new ArrayBuffer(8);
@@ -21,6 +25,18 @@ class Reader {
     static i64 = new BigInt64Array(convo);
     /** @private */
     static f64 = new Float64Array(convo);
+
+    /** @protected */
+    static UTF8 = (() => {
+        let Decoder = new TextDecoder();
+        let Encoder = new TextEncoder();
+
+        return {
+            encode: Encoder.encode,
+            decode: Decoder.decode,
+            encodeInto: Encoder.encodeInto
+        }
+    })();
 
     /**
      * @protected
@@ -88,6 +104,56 @@ class Reader {
         Reader.u8.set(this.buffer.subarray(this.at, this.at += 8));
         return Reader.f64[0];
     }
+
+
+    vu1() {
+        return this.u8() & 0x01
+    }
+    vu7() {
+        return this.u8() & 0x7F;
+    }
+    vs7() {
+        let out = this.vu7();
+        let sign = (out & 0x40) >> 6
+        out ^= 0 - sign
+        out += sign;
+        return out;
+    }
+    // VarUint32
+    // LEB128 Unsigned
+    vu32() {
+        let i = 0;
+        let out = 0;
+        do {
+            out |= this.buffer[this.at] >>> i
+            i += 7
+            this.at++
+        } while (this.buffer[this.at] & 0x80);
+
+        return out;
+    }
+
+    // VarSint32
+    // LEB128 Signed
+    vs32() {
+        return this.vu32() ^ 0;
+    }
+
+    byteArray() {
+        return this.buffer.subarray(this.at, this.at += this.vu32());
+    }
+
+    array(readFunc, length = this.vu32()) {
+        let out = Array(length);
+
+        for (let i = 0; i < length; ++i) out[i] = readFunc.call(this, i);
+
+        return out;
+    }
+
+    utf8(length = this.vu32()) {
+        return Reader.UTF8.decode(this.buffer.subarray(this.at, this.at += length));
+    }
 }
 
-module.exports = Reader;
+export default Reader;
