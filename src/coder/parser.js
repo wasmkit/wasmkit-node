@@ -1,4 +1,4 @@
-const Reader = require('./reader');
+const WASMReader = require('./wasm_reader');
 const SectionParsers = require('./sections')
 const chalk = require('chalk');
 
@@ -16,7 +16,7 @@ const SECTIONS = {
     0xB: "DataSection",
 }
 
-class Parser extends Reader {
+class Parser extends WASMReader {
     parse() {
         this.at = 0;
 
