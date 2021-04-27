@@ -26,39 +26,45 @@ class TypeSectionParser extends WASMReader {
                 fields: {},
             }
             switch (importDef.kind) {
-                case "func":
+                case "func": {
                     importDef.fields.sigIndex = this.vu32()
                     break;
-                case "table":
-                    let type = this.readTypeEnc();
+                }
+                case "table": {
+                    const type = this.readTypeEnc();
+                    if (!TABLE_ELEM_TYPES.includes(type)) this.parseError('Invalid element type `' + type + '` for table');
 
                     importDef.fields.elementType = type;
-                    if (!TABLE_ELEM_TYPES.includes(type)) throw new SyntaxError('Invalid element type `' + type + '` for table')
-                    let resizable = {
-                        flags: this.vu32(),
-                        initial: this.vu32()
-                    }
-                    if (resizable.flags & 1) resizable.maximum = this.vu32()
-                    if (resizable.minimum > resizable.maximum) throw new SyntaxError('Resizable limit minimum MUST be less than the maximum')
-                    importDef.fields.resizable = resizable;
-                    break;
-                case "memory":
-                    const resizable = {
-                        flags: this.vu32(),
-                        initial: this.vu32()
-                    }
-                    if (resizable.flags & 1) resizable.maximum = this.vu32();
-                    if (resizable.minimum > resizable.maximum) throw new SyntaxError('Resizable limit minimum MUST be less than the maximum');
 
-                    importDef.fields.resizable = resizable;
+                    const fields = {
+                        flags: this.vu32(),
+                        initial: this.vu32()
+                    }
+                    if (fields.flags & 1) fields.maximum = this.vu32()
+                    if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum')
+                    importDef.fields = fields;
                     break;
-                case "global":
+                }
+                case "memory": {
+                    const fields = {
+                        flags: this.vu32(),
+                        initial: this.vu32()
+                    }
+                    if (fields.flags & 1) fields.maximum = this.vu32();
+                    if (fields.flags & 2) fields.shared = true;
+                    if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
+
+                    importDef.fields = fields;
+                    break;
+                }
+                case "global": {
                     const type = this.readTypeEnc();
                     importDef.fields.type = type;
                     importDef.fields.mutable = this.vu1();
                     break;
+                }
                 default:
-                    throw new SyntaxError('Invalid External Kind')
+                    this.parseError('Invalid External Kind')
 
             }
 
