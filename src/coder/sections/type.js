@@ -1,6 +1,6 @@
-const Reader = require('../reader');
+const WASMReader = require('../wasm_reader');
 
-class TypeSectionParser extends Reader {
+class TypeSectionParser extends WASMReader {
     parse() {
         let types = []
         let numTypes = types.length = this.vu32()
