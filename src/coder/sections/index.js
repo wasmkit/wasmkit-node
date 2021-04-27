@@ -15,5 +15,6 @@
 
 module.exports = {
     TypeSection: require('./type'),
-    ImportSection: require('./import')
+    ImportSection: require('./import'),
+    FunctionSection: require('./function')
 };
