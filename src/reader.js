@@ -156,4 +156,4 @@ class Reader {
     }
 }
 
-export default Reader;
+module.exports = Reader;
