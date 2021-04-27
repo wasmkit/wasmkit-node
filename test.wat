@@ -8,4 +8,4 @@
   (func (type 1)
     i32.const 42
     drop)
-  (export "e" (func 1)))
+  (export "TEST" (func 1)))

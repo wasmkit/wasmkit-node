@@ -19,5 +19,6 @@ module.exports = {
     FunctionSection: require('./function'),
     TableSection: require('./table'),
     LinearMemorySection: require('./memory'),
-    GlobalSection: require('./global')
+    GlobalSection: require('./global'),
+    ExportSection: require('./export'),
 };
