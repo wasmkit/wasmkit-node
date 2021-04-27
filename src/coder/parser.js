@@ -1,8 +1,10 @@
 const WASMReader = require('./wasm_reader');
-const SectionParsers = require('./sections')
+const SectionParsers = require('./sections/')
 const chalk = require('chalk');
+const Reader = require('./reader');
 
 const SECTIONS = {
+    0x0: "CustomSection",
     0x1: "TypeSection",
     0x2: "ImportSection",
     0x3: "FunctionSection",
@@ -19,8 +21,9 @@ const SECTIONS = {
 class Parser extends WASMReader {
     parse() {
         this.at = 0;
+        this.size = this.buffer.byteLength;
 
-        if (this.littleEndian(this.i32()) !== 0x00_61_73_6D) return this.parseError('Invalid magic num');
+        if (this.endianSwap(this.i32()) !== 0x0061736D) return this.parseError('Invalid magic num');
         if (this.i32() !== 1) return this.parseError('Invalid version');
 
         const wasm = {
@@ -29,9 +32,13 @@ class Parser extends WASMReader {
         }
 
         while (this.at < this.size) {
+
             const id = this.u8();
-            const name = SECTIONS[id];
+
             const bytes = this.byteArray();
+            if (this.at >= this.size) break;
+            const name = SECTIONS[id];
+            if (!name) this.parseError('No name ' + id + ' or unmonitored section');
             try {
                 if (!SectionParsers[name]) {
                     wasm.sections.push({
@@ -59,11 +66,6 @@ class Parser extends WASMReader {
 
         return wasm;
     }
-
-    parseError(err) {
-        let msg = err.message || err;
-        console.log(chalk.red.bold(msg + "@" + this.at) + "\n");
-
-        throw err;
-    }
 }
+
+module.exports = Parser;

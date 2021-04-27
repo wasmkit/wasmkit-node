@@ -6,25 +6,25 @@ class Reader {
     /** @private */
     static convo = new ArrayBuffer(8);
     /** @private */
-    static u8 = new Uint8Array(convo);
+    static u8 = new Uint8Array(Reader.convo);
     /** @private */
-    static i8 = new Int8Array(convo);
+    static i8 = new Int8Array(Reader.convo);
     /** @private */
-    static u16 = new Uint16Array(convo);
+    static u16 = new Uint16Array(Reader.convo);
     /** @private */
-    static i16 = new Int16Array(convo);
+    static i16 = new Int16Array(Reader.convo);
     /** @private */
-    static u32 = new Uint32Array(convo);
+    static u32 = new Uint32Array(Reader.convo);
     /** @private */
-    static i32 = new Int32Array(convo);
+    static i32 = new Int32Array(Reader.convo);
     /** @private */
-    static f32 = new Float32Array(convo);
+    static f32 = new Float32Array(Reader.convo);
     /** @private */
-    static u64 = new BigUint64Array(convo);
+    static u64 = new BigUint64Array(Reader.convo);
     /** @private */
-    static i64 = new BigInt64Array(convo);
+    static i64 = new BigInt64Array(Reader.convo);
     /** @private */
-    static f64 = new Float64Array(convo);
+    static f64 = new Float64Array(Reader.convo);
 
     /** @protected */
     static UTF8 = (() => {
@@ -32,9 +32,15 @@ class Reader {
         let Encoder = new TextEncoder();
 
         return {
-            encode: Encoder.encode,
-            decode: Decoder.decode,
-            encodeInto: Encoder.encodeInto
+            encode(...args) {
+                return Encoder.encode.apply(Endoer, args);
+            },
+            decode(...args) {
+                return Decoder.decode.apply(Decoder, args);
+            },
+            encodeInto(...args) {
+                return Encoder.encodeInto.apply(Encoder, args);
+            }
         }
     })();
 
@@ -47,14 +53,31 @@ class Reader {
             ((int >> 8) & 0xFF00) |
             ((int >> 24) & 0xFF));
     }
+    /**
+     * @protected
+     */
+    endianSwap(int) {
+        return (((int & 0xFF) << 24) |
+            ((int & 0xFF00) << 8) |
+            ((int >> 8) & 0xFF00) |
+            ((int >> 24) & 0xFF));
+    }
 
     /**
      * @param {ArrayBuffer|TypedArray|Buffer} buffer Buffer that contains data to be read
      */
     constructor(buffer) {
         this.buffer = new Uint8Array(buffer.buffer || buffer);
-        this.at = 0;
+        this._at = 0;
+        this.lastAt = 0;
         this.size = this.buffer.byteLength;
+    }
+    get at() {
+        return this._at;
+    }
+    set at(v) {
+        this.lastAt = v ? this.at : 0;
+        this._at = v;
     }
 
     u8() {
@@ -113,11 +136,9 @@ class Reader {
     vu7() {
         return this.u8() & 0x7F;
     }
-    vs7() {
+    vs7() { // kinda cheating:
         let out = this.vu7();
-        let sign = (out & 0x40) >> 6
-        out ^= 0 - sign
-        out += sign;
+        out -= (out & 0x40) << 1;
         return out;
     }
     // VarUint32
@@ -140,8 +161,8 @@ class Reader {
         return this.vu32() ^ 0;
     }
 
-    byteArray() {
-        return this.buffer.subarray(this.at, this.at += this.vu32());
+    byteArray(len = this.vu32()) {
+        return this.buffer.slice(this.at, this.at += len);
     }
 
     array(readFunc, length = this.vu32()) {
