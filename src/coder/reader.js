@@ -152,7 +152,7 @@ class Reader {
         return out;
     }
 
-    utf8(length = this.vu32()) {
+    string(length = this.vu32()) {
         return Reader.UTF8.decode(this.buffer.subarray(this.at, this.at += length));
     }
 }
