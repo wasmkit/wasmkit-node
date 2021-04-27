@@ -1,5 +1,5 @@
 const Reader = require('./reader');
-const SectionParsers = require('./sections/')
+const SectionParsers = require('./sections')
 const chalk = require('chalk');
 
 const SECTIONS = {
