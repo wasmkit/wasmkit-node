@@ -8,7 +8,7 @@ class FunctionSectionParser extends WASMReader {
     }
     parse(options = this.options) {
         const functions = this.array(() => {
-            this.vu32()
+            return this.vu32()
         });
 
         return functions;
