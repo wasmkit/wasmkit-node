@@ -1,8 +1,11 @@
 (module
-  (type $typeTest0 (func (param i32) (result i32)))
-  (type $typeTest1 (func (param f32)))
-  (import "import" "test" (memory $cow 10))
-  (table 20 funcref)
-  (func $cow (type $typeTest1)
-    local.get 0
-    drop))
+  (import "foo" "bar" (func (param f32)))
+  (memory (data "hi"))
+  (type (func (param i32) (result i32)))
+  (start 1)
+  (table 0 1 anyfunc)
+  (func)
+  (func (type 1)
+    i32.const 42
+    drop)
+  (export "e" (func 1)))

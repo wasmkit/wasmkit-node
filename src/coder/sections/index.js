@@ -18,4 +18,5 @@ module.exports = {
     ImportSection: require('./import'),
     FunctionSection: require('./function'),
     TableSection: require('./table'),
+    LinearMemorySection: require('./memory')
 };

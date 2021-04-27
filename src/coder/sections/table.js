@@ -3,14 +3,14 @@ const WASMReader = require('../wasm_reader');
 const TABLE_ELEM_TYPES = [
     "funcref"
 ]
-class FunctionSectionParser extends WASMReader {
+class TableSectionParser extends WASMReader {
     constructor(buffer, options = {}) {
         super(buffer);
 
         this.options = typeof options !== 'object' ? {} : options;
     }
     parse(options = this.options) {
-        const descriptors = this.array(() => {
+        const tableDescriptors = this.array(() => {
             const type = this.readTypeEnc();
 
             if (!TABLE_ELEM_TYPES.includes(type)) this.parseError('Invalid element type `' + type + '` for table')
@@ -27,9 +27,9 @@ class FunctionSectionParser extends WASMReader {
             }
         });
 
-        return descriptors;
+        return tableDescriptors;
     }
 
 }
 
-module.exports = FunctionSectionParser;
+module.exports = TableSectionParser;
