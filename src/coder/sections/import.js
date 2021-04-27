@@ -52,6 +52,7 @@ class TypeSectionParser extends WASMReader {
                     }
                     if (fields.flags & 1) fields.maximum = this.vu32();
                     if (fields.flags & 2) fields.shared = true;
+                    if (fields.shared && !options.sharedMemory) this.parseError('Shared memory is not supported by current options');
                     if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
 
                     importDef.fields = fields;
