@@ -54,6 +54,7 @@ class Reader {
     constructor(buffer) {
         this.buffer = new Uint8Array(buffer.buffer || buffer);
         this.at = 0;
+        this.size = this.buffer.byteLength;
     }
 
     u8() {

@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/theberge-256/wasm2wat/issues"
   },
-  "homepage": "https://github.com/theberge-256/wasm2wat#readme"
+  "homepage": "https://github.com/theberge-256/wasm2wat#readme",
+  "dependencies": {
+    "chalk": "^4.1.1"
+  }
 }
