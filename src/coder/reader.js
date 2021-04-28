@@ -1,6 +1,6 @@
-Object.getPrototypeOf(Uint8Array).prototype.read = function () {
-    return new Reader(this);
-}
+// Object.getPrototypeOf(Uint8Array).prototype.read = function () {
+//     return new Reader(this);
+// }
 
 class Reader {
     /** @private */

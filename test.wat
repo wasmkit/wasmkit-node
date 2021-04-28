@@ -7,6 +7,7 @@
   (elem 0 (i32.const 0))
   (func)
   (func (type 1)
+    (local $HowDoYouDo i32)
     i32.const 42
     drop)
   (export "TEST" (func 1)))

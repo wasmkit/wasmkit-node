@@ -22,5 +22,6 @@ module.exports = {
     GlobalSection: require('./global'),
     ExportSection: require('./export'),
     StartSection: require('./start'),
-    ElementSection: require('./element')
+    ElementSection: require('./element'),
+    CodeSection: require('./code')
 };
