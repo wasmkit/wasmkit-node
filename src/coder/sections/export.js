@@ -1,10 +1,6 @@
 const WASMReader = require('../wasm_reader');
-const EXTERNAL_KIND = [
-    "func",
-    "table",
-    "memory",
-    "global"
-]
+
+const { EXTERNAL_KIND } = require('../const');
 class ExportSectionParser extends WASMReader {
     constructor(buffer, options = {}) {
         super(buffer);

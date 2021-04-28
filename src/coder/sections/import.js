@@ -1,15 +1,6 @@
 const WASMReader = require('../wasm_reader');
 
-const EXTERNAL_KIND = [
-    "func",
-    "table",
-    "memory",
-    "global"
-]
-
-const TABLE_ELEM_TYPES = [
-    "funcref"
-]
+const { EXTERNAL_KIND, TABLE_ELEM_TYPES } = require('../const')
 
 class TypeSectionParser extends WASMReader {
     constructor(buffer, options = {}) {
