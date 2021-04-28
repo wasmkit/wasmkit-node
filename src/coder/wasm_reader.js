@@ -37,11 +37,13 @@ class WASMReader extends Reader {
             if (this.vu32() !== 0x0B) this.parseError('Expected 0x0B `end` after instantiation time initializor');
 
             return out;
+        } else if (opcode === 0x0B) { // end
+            return null;
         } else this.parseError('Invalid memnonic for instantiation time initializor');
 
     }
     parseError(err) {
-        let msg = err.message || err;
+        let msg = this.constructor.name + " " + (err.message || err);
         console.log(chalk.red.bold(msg + " @" + this.lastAt.toString(16).padStart(4, "0")) + "\n");
         console.log(chalk.red(Array.from(this.buffer.subarray(this.lastAt, this._at)).map(r => r.toString(16).padStart(2, "0")).join(' ')))
 

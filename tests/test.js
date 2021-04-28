@@ -7,5 +7,9 @@ console.log('WASM Validation : ' + WebAssembly.validate(testWasm));
 
 const p = new WASMParser(Uint8Array.from(testWasm));
 
-console.log(p.parse())
+const wasm = p.parse();
+
+for (let section of wasm.sections) {
+    console.log(section.name, section.bytes, section.data);
+}
 
