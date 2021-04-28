@@ -1,5 +1,5 @@
 const fs = require("fs");
-const Parser = require('../src/coder/parser');
+const WASMParser = require('../src/coder/parser');
 
 const testWasm = fs.readFileSync('./test.wasm');
 
