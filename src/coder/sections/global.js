@@ -10,7 +10,7 @@ class GlobalSectionParser extends WASMReader {
         const globals = this.array(() => {
             const global = {
                 desc: { type: this.readTypeEnc(), mutable: this.vu1() },
-                initial: this.readInstruction()
+                initial: this.readInstruction() // instruction reader required
             };
             const end = this.readInstruction();
             if (end.type !== 'end') this.parseError('Unable to find ending for instantiation-time initializer')
