@@ -9,11 +9,9 @@ class ElementSectionParser extends WASMReader {
     parse(options = this.options) {
         const tableInitializors = this.array(() => {
             const tableInitializor = {
-                index: this.vu(),
+                index: this.vu32(),
             }
-            // TODO: Implement this into memnonic time initializor method
-            tableInitializor.offset = this.readInstruction(); // instruction reader required
-            this.readInstruction(); //
+            tableInitializor.offset = this.readInitializer();
             // Its elem-type is alawys `func-ref`, so we'll call it funcs
             tableInitializor.funcs = this.array(() => this.vu32());
             return tableInitializor;

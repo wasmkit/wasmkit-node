@@ -22,6 +22,34 @@ class WASMReader extends Reader {
         }
         return name
     }
+    readInitializer() {
+        if (this.readInstruction) throw new Error('Update this code');
+
+        const opcode = this.vu32();
+
+        if (opcode === 0x41) { // i32.const
+            const out = {
+                type: "i32.const",
+                op: 0x41,
+                value: this.vu32()
+            }
+            // end appended to all
+            if (this.vu32() !== 0x0B) this.parseError('Expected 0x0B `end` after instantiation time initializor');
+
+            return out;
+        } else if (opcode === 0x23) { // global.get
+            const out = {
+                type: "global.get",
+                op: 0x23,
+                index: this.vu32(),
+            };
+            // end appended to all
+            if (this.vu32() !== 0x0B) this.parseError('Expected 0x0B `end` after instantiation time initializor');
+
+            return out;
+        } else this.parseError('Invalid memnonic for instantiation time initializor');
+
+    }
     parseError(err) {
         let msg = err.message || err;
         console.log(chalk.red.bold(msg + " @" + this.lastAt.toString(16).padStart(4, "0")) + "\n");

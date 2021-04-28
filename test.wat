@@ -4,6 +4,7 @@
   (type (func (param i32) (result i32)))
   (start 1)
   (table 0 1 anyfunc)
+  (elem 0 (i32.const 0))
   (func)
   (func (type 1)
     i32.const 42
