@@ -1,10 +1,11 @@
 const fs = require("fs");
 const WASMParser = require('../src/coder/parser');
 
-const testWasm = fs.readFileSync('./test.wasm');
+const testWasm = fs.readFileSync(__dirname + '/test.wasm');
 
 console.log('WASM Validation : ' + WebAssembly.validate(testWasm));
-const p = new Parser(Uint8Array.from(testWasm));
-console.log(Array.from(Uint8Array.from(testWasm)).map(e => e.toString(16).padStart(2, "0")).join(' '))
+
+const p = new WASMParser(Uint8Array.from(testWasm));
+
 console.log(p.parse())
 
