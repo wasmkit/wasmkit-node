@@ -23,5 +23,6 @@ module.exports = {
     ExportSection: require('./export'),
     StartSection: require('./start'),
     ElementSection: require('./element'),
-    CodeSection: require('./code')
+    CodeSection: require('./code'),
+    DataSection: require('./data')
 };
