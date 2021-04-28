@@ -18,7 +18,9 @@ class CodeSectionParser extends WASMReader {
                 });
             }).flat();
 
-            codeReader.at = codeReader.buffer.byteLength - 1;
+            while (codeReader.at < codeReader.buffer.byteLength - 1) {
+                codeReader.at++;
+            };
 
             if (codeReader.u8() !== 0x0B /* end op code */) codeReader.parseError('`end` required at the end of the code');
 
