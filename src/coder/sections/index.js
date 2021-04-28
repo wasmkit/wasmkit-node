@@ -21,4 +21,5 @@ module.exports = {
     LinearMemorySection: require('./memory'),
     GlobalSection: require('./global'),
     ExportSection: require('./export'),
+    StartSection: require('./start')
 };
