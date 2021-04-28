@@ -4,7 +4,7 @@
   "description": "Converts web assembly to webassembly text. Written in javascript",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node ./tests/test.js"
   },
   "repository": {
     "type": "git",
