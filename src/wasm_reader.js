@@ -30,8 +30,8 @@ class WASMReader extends Reader {
 
     parseError(err, tolerate = false) {
         let msg = this.constructor.name + " " + (err.message || err);
+
         console.log(chalk.red.bold(msg + " @" + this.lastAt.toString(16).padStart(4, "0")) + "\n");
-        // console.log(chalk.red(Array.from(this.buffer.subarray(this.lastAt, this._at)).map(r => r.toString(16).padStart(2, "0")).join(' ')))
 
         if (!tolerate) throw err;
     }
