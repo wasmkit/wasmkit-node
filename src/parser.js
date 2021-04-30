@@ -49,6 +49,7 @@ class WASMParser extends WASMReader {
             }
         }
 
+        wasm.getSection = (i) => wasm.sections.find(({ id }) => id === i)
 
         return wasm;
     }
