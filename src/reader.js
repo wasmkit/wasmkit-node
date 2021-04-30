@@ -155,6 +155,18 @@ class Reader {
         return out;
     }
 
+    vu64() {
+        let i = 0n;
+        let out = 0n;
+        while (this.buffer[this.at] & 0x80) {
+            out |= BigInt(this.buffer[this.at++] & 0x7F) << i;
+            i += 7n;
+        }
+        out |= BigInt(this.buffer[this.at++] & 0x7F) << i;
+
+        return out;
+    }
+
     // VarSint32
     // LEB128 Signed
     vs32() {

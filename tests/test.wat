@@ -19,5 +19,5 @@
   ;; function section
   (func $cow (type 1)
     ;; code section
-    i32.const 42
+    i64.const 2120391230120391123
     drop))

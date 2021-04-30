@@ -13,3 +13,5 @@ for (let section of wasm.sections) {
     console.log(section.name, section.bytes, section.data);
 }
 
+
+console.log(wasm.getSection(0x0A).data[0].instructions)

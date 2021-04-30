@@ -178,9 +178,8 @@ class Instruction {
             case OPCODE.I32_CONST:
                 immediates.push(reader.vu32());
                 break;
-            // TODO Fix
             case OPCODE.I64_CONST:
-                immediates.push(reader.vu32());
+                immediates.push(reader.vu64());
                 break;
             case OPCODE.F32_CONST:
                 immediates.push(reader.f32());
