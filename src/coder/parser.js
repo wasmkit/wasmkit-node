@@ -21,6 +21,7 @@ class Parser extends WASMReader {
             const id = this.u8();
 
             const bytes = this.byteArray();
+
             if (this.at >= this.size) break;
             const name = SECTIONS[id];
             if (!name) this.parseError('No name ' + id + ' or unmonitored section');

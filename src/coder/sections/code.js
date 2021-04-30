@@ -7,15 +7,13 @@ class CodeSectionParser extends WASMReader {
         this.options = typeof options !== 'object' ? {} : options;
     }
     parse(options = this.options) {
-        const bodies = this.array(() => {// function bodies
+        const bodies = this.array((i) => {// function bodies
             const bodyBytes = this.byteArray();
 
             const codeReader = new WASMReader(bodyBytes);
 
             const locals = codeReader.array(function () {
-                return codeReader.array(function () {
-                    return this.readTypeEnc()
-                });
+                return Array(this.vu32()).fill(this.readTypeEnc())
             }).flat();
 
             while (codeReader.at < codeReader.buffer.byteLength - 1) {

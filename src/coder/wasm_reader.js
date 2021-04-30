@@ -8,7 +8,7 @@ class WASMReader extends Reader {
 
         let name = TYPE_ENC[code];
         if (!name) {
-            throw new SyntaxError('Invalid Type Encoding');
+            throw new SyntaxError('Invalid Type Encoding ' + (this.buffer[this.at - 1]).toString(16));
         }
         return name
     }
@@ -42,12 +42,12 @@ class WASMReader extends Reader {
         } else this.parseError('Invalid memnonic for instantiation time initializor');
 
     }
-    parseError(err) {
+    parseError(err, tolerate = false) {
         let msg = this.constructor.name + " " + (err.message || err);
         console.log(chalk.red.bold(msg + " @" + this.lastAt.toString(16).padStart(4, "0")) + "\n");
-        console.log(chalk.red(Array.from(this.buffer.subarray(this.lastAt, this._at)).map(r => r.toString(16).padStart(2, "0")).join(' ')))
+        // console.log(chalk.red(Array.from(this.buffer.subarray(this.lastAt, this._at)).map(r => r.toString(16).padStart(2, "0")).join(' ')))
 
-        throw err;
+        if (!tolerate) throw err;
     }
 }
 module.exports = WASMReader;

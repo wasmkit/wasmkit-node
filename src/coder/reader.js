@@ -146,11 +146,11 @@ class Reader {
     vu32() {
         let i = 0;
         let out = 0;
-        do {
-            out |= this.buffer[this.at] >>> i
-            i += 7
-            this.at++
-        } while (this.buffer[this.at] & 0x80);
+        while (this.buffer[this.at] & 0x80) {
+            out |= (this.buffer[this.at++] & 0x7F) << i;
+            i += 7;
+        }
+        out |= (this.buffer[this.at++] & 0x7F) << i;
 
         return out;
     }

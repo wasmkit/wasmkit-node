@@ -8,7 +8,6 @@ class TypeSectionParser extends WASMReader {
     }
     parse(options = this.options) {
         const types = this.array((index) => {
-
             const type = this.readTypeEnc();
             if (type !== 'func') this.parseError('Invalid Type');
             // return { type, params: null, results: null };
