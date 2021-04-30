@@ -5,7 +5,7 @@ const Instruction = require('./instruction');
 
 class WASMReader extends Reader {
     readTypeEnc() {
-        let code = this.vs7();
+        let code = this.u8();
 
         let name = TYPE_ENC[code];
         if (!name) {

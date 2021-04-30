@@ -6,10 +6,6 @@ class Instruction {
         const op = reader.u8();
         let immediates = [];
         switch (op) {
-            case OPCODE.UNREACHABLE:
-                break;
-            case OPCODE.NOP:
-                break;
             case OPCODE.BLOCK:
                 immediates.push(reader.readTypeEnc());
                 break;
@@ -18,10 +14,6 @@ class Instruction {
                 break;
             case OPCODE.IF:
                 immediates.push(reader.readTypeEnc());
-                break;
-            case OPCODE.ELSE:
-                break;
-            case OPCODE.END:
                 break;
             case OPCODE.BR:
                 immediates.push(reader.vu32());
@@ -40,18 +32,12 @@ class Instruction {
 
                 immediates.push(reader.vu32());
                 break;
-            case OPCODE.RETURN:
-                break;
             case OPCODE.CALL:
                 immediates.push(reader.vu32());
                 break;
             case OPCODE.CALL_INDIRECT:
                 immediates.push(reader.vu32());
                 immediates.push(reader.u8());
-                break;
-            case OPCODE.DROP:
-                break;
-            case OPCODE.SELECT:
                 break;
             case OPCODE.GET_LOCAL:
                 immediates.push(reader.vu32());
@@ -157,7 +143,7 @@ class Instruction {
                 immediates.push(reader.f64());
                 break;
             default:
-                throw "Unsupported opcode " + opcode;
+                if (OPCODE > 0xFE) throw "Unsupported opcode " + op;
         }
 
         return new Instruction(op, immediates);
