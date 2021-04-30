@@ -1,5 +1,7 @@
 const WASMReader = require('../wasm_reader');
 
+// For reference: github.com/sunfishcode/wasm-reference-manual/blob/master/WebAssembly.md#export-section
+
 const { EXTERNAL_KIND } = require('../const');
 class ExportSectionParser extends WASMReader {
     constructor(buffer, options = {}) {

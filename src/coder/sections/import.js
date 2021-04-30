@@ -1,5 +1,5 @@
 const WASMReader = require('../wasm_reader');
-
+// For reference: github.com/sunfishcode/wasm-reference-manual/blob/master/WebAssembly.md#import-section
 const { EXTERNAL_KIND, TABLE_ELEM_TYPES } = require('../const')
 
 class TypeSectionParser extends WASMReader {

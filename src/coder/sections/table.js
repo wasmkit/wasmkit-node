@@ -1,8 +1,8 @@
 const WASMReader = require('../wasm_reader');
 
-const TABLE_ELEM_TYPES = [
-    "funcref"
-]
+// For reference: github.com/sunfishcode/wasm-reference-manual/blob/master/WebAssembly.md#table-section
+
+const { TABLE_ELEM_TYPES } = require('../const')
 class TableSectionParser extends WASMReader {
     constructor(buffer, options = {}) {
         super(buffer);

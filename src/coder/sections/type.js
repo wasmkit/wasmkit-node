@@ -1,5 +1,6 @@
 const WASMReader = require('../wasm_reader');
 
+// For reference: github.com/sunfishcode/wasm-reference-manual/blob/master/WebAssembly.md#type-section
 class TypeSectionParser extends WASMReader {
     constructor(buffer, options = {}) {
         super(buffer);
