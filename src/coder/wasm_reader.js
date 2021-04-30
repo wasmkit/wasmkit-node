@@ -1,6 +1,7 @@
 const chalk = require('chalk');
 const Reader = require('./reader');
-const { TYPE_ENC } = require('./const')
+const { TYPE_ENC, OPCODE } = require('./const');
+const Instruction = require('./instruction');
 
 class WASMReader extends Reader {
     readTypeEnc() {
@@ -13,35 +14,20 @@ class WASMReader extends Reader {
         return name
     }
     readInitializer() {
-        if (this.readInstruction) throw new Error('Update this code');
+        // if (this.readInstruction) throw new Error('Update this code');
 
-        const opcode = this.vu32();
+        const instruction = this.readInstruction();
 
-        if (opcode === 0x41) { // i32.const
-            const out = {
-                type: "i32.const",
-                op: 0x41,
-                value: this.vu32()
-            }
-            // end appended to all
-            if (this.vu32() !== 0x0B) this.parseError('Expected 0x0B `end` after instantiation time initializor');
+        if (instruction.opcode === OPCODE.END) return null;
+        if (this.readInstruction().opcode !== OPCODE.END) this.parseError('Expected 0x0B `end` after instantiation time initializor');
 
-            return out;
-        } else if (opcode === 0x23) { // global.get
-            const out = {
-                type: "global.get",
-                op: 0x23,
-                index: this.vu32(),
-            };
-            // end appended to all
-            if (this.vu32() !== 0x0B) this.parseError('Expected 0x0B `end` after instantiation time initializor');
-
-            return out;
-        } else if (opcode === 0x0B) { // end
-            return null;
-        } else this.parseError('Invalid memnonic for instantiation time initializor');
-
+        return instruction;
     }
+
+    readInstruction() {
+        return Instruction.readFrom(this);
+    }
+
     parseError(err, tolerate = false) {
         let msg = this.constructor.name + " " + (err.message || err);
         console.log(chalk.red.bold(msg + " @" + this.lastAt.toString(16).padStart(4, "0")) + "\n");

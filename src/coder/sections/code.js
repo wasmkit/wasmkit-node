@@ -1,5 +1,4 @@
 const WASMReader = require('../wasm_reader');
-
 // For reference: github.com/sunfishcode/wasm-reference-manual/blob/master/WebAssembly.md#code-section
 class CodeSectionParser extends WASMReader {
     constructor(buffer, options = {}) {
@@ -17,16 +16,17 @@ class CodeSectionParser extends WASMReader {
                 return Array(this.vu32()).fill(this.readTypeEnc())
             }).flat();
 
-            while (codeReader.at < codeReader.buffer.byteLength - 1) {
-                codeReader.at++;
+            const instructions = [];
+            while (codeReader.at < codeReader.buffer.byteLength) {
+                instructions.push(codeReader.readInstruction());
             };
 
-            if (codeReader.u8() !== 0x0B /* end op code */) codeReader.parseError('`end` required at the end of the code');
+            if (instructions[instructions.length - 1].opcode !== 0x0B /* end op code */) codeReader.parseError('`end` required at the end of the code');
 
             return {
                 bodyBytes,
                 locals,
-                instructions: null
+                instructions
             }
         });
 
