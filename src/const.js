@@ -216,3 +216,4 @@ module.exports.OPCODE = {
     BULK_MEMORY: 0xfc,
     ATOMIC: 0xfe,
 }
+module.exports.OPCODE._ALL = Object.values(module.exports.OPCODE).filter(v => typeof v === 'number');

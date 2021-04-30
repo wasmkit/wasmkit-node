@@ -188,7 +188,7 @@ class Instruction {
                 immediates.push(reader.f64());
                 break;
             default:
-                if (OPCODE > 0xFE) throw "Unsupported opcode " + op;
+                if (OPCODE._ALL.indexOf(op) === -1) throw "Unsupported opcode " + op;
         }
 
         return new Instruction(op, immediates);
