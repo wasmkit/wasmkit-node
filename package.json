@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/theberge-256/wasm2wat.git"
+    "url": "git+https://github.com/theberge-256/wasm-parser.git"
   },
   "keywords": [
     "wasm",
@@ -17,9 +17,9 @@
   "author": "awt256",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/theberge-256/wasm2wat/issues"
+    "url": "https://github.com/theberge-256/wasm-parser/issues"
   },
-  "homepage": "https://github.com/theberge-256/wasm2wat#readme",
+  "homepage": "https://github.com/theberge-256/wasm-parser#readme",
   "dependencies": {
     "chalk": "^4.1.1"
   }
