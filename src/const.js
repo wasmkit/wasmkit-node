@@ -213,6 +213,7 @@ module.exports.OPCODE = {
     I64_EXTEND8_S: 0xc2,
     I64_EXTEND16_S: 0xc3,
     I64_EXTEND32_S: 0xc4,
+    // TODO: todo
     BULK_MEMORY: 0xfc,
     ATOMIC: 0xfe,
 }
