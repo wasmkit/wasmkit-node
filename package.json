@@ -1,6 +1,6 @@
 {
   "name": "wasm2wat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Converts web assembly to webassembly text. Written in javascript",
   "main": "index.js",
   "scripts": {
