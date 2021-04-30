@@ -3,7 +3,7 @@ const SectionParsers = require('./sections')
 const { SECTIONS } = require('./const')
 
 
-class Parser extends WASMReader {
+class WASMParser extends WASMReader {
     parse() {
         this.at = 0;
         this.size = this.buffer.byteLength;
@@ -54,4 +54,4 @@ class Parser extends WASMReader {
     }
 }
 
-module.exports = Parser;
+module.exports = WASMParser;
