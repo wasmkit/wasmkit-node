@@ -1,3 +1,3 @@
-# wasm2wat
+# wasm-parser
 
-Converts web assembly to webassembly text. Written in javascript
+Reads and parses .wasm files. Written in javascript
