@@ -1,5 +1,5 @@
 const WASMReader = require('./wasm_reader');
-const SectionParsers = require('./sections/')
+const SectionParsers = require('./sections')
 const { SECTIONS } = require('./const')
 
 
