@@ -3,33 +3,22 @@
 // }
 
 class Reader {
-    /** @private */
+    // Protected data used for conversions
     static convo = new ArrayBuffer(8);
-    /** @private */
     static u8 = new Uint8Array(Reader.convo);
-    /** @private */
     static i8 = new Int8Array(Reader.convo);
-    /** @private */
     static u16 = new Uint16Array(Reader.convo);
-    /** @private */
     static i16 = new Int16Array(Reader.convo);
-    /** @private */
     static u32 = new Uint32Array(Reader.convo);
-    /** @private */
     static i32 = new Int32Array(Reader.convo);
-    /** @private */
     static f32 = new Float32Array(Reader.convo);
-    /** @private */
     static u64 = new BigUint64Array(Reader.convo);
-    /** @private */
     static i64 = new BigInt64Array(Reader.convo);
-    /** @private */
     static f64 = new Float64Array(Reader.convo);
 
-    /** @protected */
     static UTF8 = (() => {
-        let Decoder = new TextDecoder();
-        let Encoder = new TextEncoder();
+        const Decoder = new TextDecoder();
+        const Encoder = new TextEncoder();
 
         return {
             encode(...args) {
@@ -44,18 +33,12 @@ class Reader {
         }
     })();
 
-    /**
-     * @protected
-     */
     static endianSwap(int) {
         return (((int & 0xFF) << 24) |
             ((int & 0xFF00) << 8) |
             ((int >> 8) & 0xFF00) |
             ((int >> 24) & 0xFF));
     }
-    /**
-     * @protected
-     */
     endianSwap(int) {
         return (((int & 0xFF) << 24) |
             ((int & 0xFF00) << 8) |
@@ -63,19 +46,18 @@ class Reader {
             ((int >> 24) & 0xFF));
     }
 
-    /**
-     * @param {ArrayBuffer|TypedArray|Buffer} buffer Buffer that contains data to be read
-     */
     constructor(buffer) {
         this.buffer = new Uint8Array(buffer.buffer || buffer);
+        this.size = this.buffer.byteLength;
+
         this._at = 0;
         this.lastAt = 0;
-        this.size = this.buffer.byteLength;
     }
     get at() {
         return this._at;
     }
     set at(v) {
+        // Store previous position for nice(r) looking error messages
         this.lastAt = v ? this.at : 0;
         this._at = v;
     }
@@ -129,20 +111,11 @@ class Reader {
         return Reader.f64[0];
     }
 
-
     vu1() {
         return this.u8() & 0x01
     }
-    vu7() {
-        return this.u8() & 0x7F;
-    }
-    vs7() { // kinda cheating:
-        let out = this.vu7();
-        out -= (out & 0x40) << 1;
-        return out;
-    }
-    // VarUint32
-    // LEB128 Unsigned
+
+    // LEB128s
     vu32() {
         let i = 0;
         let out = 0;
@@ -166,26 +139,24 @@ class Reader {
 
         return out;
     }
-
-    // VarSint32
-    // LEB128 Signed
     vs32() {
         return this.vu32() ^ 0;
     }
 
-    byteArray(len = this.vu32()) {
-        return this.buffer.slice(this.at, this.at += len);
+    // Arrays are defined as vu(count) *count* elements
+    byteArray(length = this.vu32()) {// Elements are bytes
+        return this.buffer.slice(this.at, this.at += length);
     }
 
-    array(readFunc, length = this.vu32()) {
-        let out = Array(length);
+    array(readFunc, length = this.vu32()) {// Elements are read by readFunc
+        const out = Array(length);
 
         for (let i = 0; i < length; ++i) out[i] = readFunc.call(this, i);
 
         return out;
     }
 
-    string(length = this.vu32()) {
+    string(length = this.vu32()) {// Elements are characters
         return Reader.UTF8.decode(this.buffer.subarray(this.at, this.at += length));
     }
 }

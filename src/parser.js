@@ -1,6 +1,6 @@
 const WASMReader = require('./wasm_reader');
-const SectionParsers = require('./sections')
-const { SECTIONS } = require('./const')
+const SectionParsers = require('./sections');
+const { SECTIONS } = require('./const');
 
 
 class WASMParser extends WASMReader {
@@ -9,39 +9,42 @@ class WASMParser extends WASMReader {
         this.size = this.buffer.byteLength;
 
         if (this.endianSwap(this.i32()) !== 0x0061736D) return this.parseError('Invalid magic num');
-        if (this.i32() !== 1) return this.parseError('Invalid version');
+
+        const version = this.i32();
+
+        if (version !== 1) return this.parseError('Invalid version');
 
         const wasm = {
-            version: 1,
+            version,
             sections: []
         }
 
         while (this.at < this.size) {
-
             const id = this.u8();
-
             const bytes = this.byteArray();
 
-            if (this.at >= this.size) break;
             const name = SECTIONS[id];
-            if (!name) this.parseError('No name ' + id + ' or unmonitored section');
+
+            if (!name) this.parseError(`No name ${id} or unmonitored section`);
+
             try {
-                if (!SectionParsers[name]) {
+                if (!SectionParsers[name]) {// Examples would be Custom Sections like `name`
                     wasm.sections.push({
                         id,
                         name,
-                        bytes: bytes,
+                        bytes,
                         data: null
                     });
                     continue;
                 }
 
+                // A specific parser for each section
                 const parser = new SectionParsers[name](bytes);
 
                 wasm.sections.push({
                     id,
                     name,
-                    bytes: parser.buffer,
+                    bytes,
                     data: parser.parse()
                 })
             } catch (err) {
@@ -49,7 +52,7 @@ class WASMParser extends WASMReader {
             }
         }
 
-        wasm.getSection = (i) => wasm.sections.find(({ id }) => id === i)
+        wasm.getSection = (wantedId) => wasm.sections.find(({ id }) => id === wantedId);
 
         return wasm;
     }

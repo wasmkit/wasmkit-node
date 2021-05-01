@@ -12,7 +12,8 @@ class LinearMemorySectionParser extends WASMReader {
                 flags: this.vu32(),
                 initial: this.vu32()
             }
-            if (fields.flags & 1) fields.maximum = this.vu32()
+
+            if (fields.flags & 1) fields.maximum = this.vu32();
             if (fields.minimum > fields.maximum) return this.parseError('fields limit minimum MUST be less than the maximum');
 
             return fields

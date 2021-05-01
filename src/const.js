@@ -35,6 +35,7 @@ module.exports.TABLE_ELEM_TYPES = [
     "funcref"
 ]
 
+// names are from cetus
 module.exports.OPCODE = {
     UNREACHABLE: 0x00,
     NOP: 0x01,
@@ -214,7 +215,7 @@ module.exports.OPCODE = {
     I64_EXTEND16_S: 0xc3,
     I64_EXTEND32_S: 0xc4,
     // TODO: todo
-    BULK_MEMORY: 0xfc,
-    ATOMIC: 0xfe,
+    // BULK_MEMORY: 0xfc,
+    // ATOMIC: 0xfe,
 }
 module.exports.OPCODE._ALL = Object.values(module.exports.OPCODE).filter(v => typeof v === 'number');

@@ -16,13 +16,15 @@ class TypeSectionParser extends WASMReader {
                 kind: EXTERNAL_KIND[this.vu7()],
                 fields: {},
             }
+
             switch (importDef.kind) {
                 case "func": {
-                    importDef.fields.sigIndex = this.vu32()
+                    importDef.fields.sigIndex = this.vu32();
                     break;
                 }
                 case "table": {
                     const type = this.readTypeEnc();
+
                     if (!TABLE_ELEM_TYPES.includes(type)) this.parseError('Invalid element type `' + type + '` for table');
 
                     importDef.fields.elementType = type;
@@ -31,8 +33,10 @@ class TypeSectionParser extends WASMReader {
                         flags: this.vu32(),
                         initial: this.vu32()
                     }
-                    if (fields.flags & 1) fields.maximum = this.vu32()
-                    if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum')
+
+                    if (fields.flags & 1) fields.maximum = this.vu32();
+                    if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
+
                     importDef.fields = fields;
                     break;
                 }
@@ -41,8 +45,10 @@ class TypeSectionParser extends WASMReader {
                         flags: this.vu32(),
                         initial: this.vu32()
                     }
+
                     if (fields.flags & 1) fields.maximum = this.vu32();
-                    if (fields.flags & 2) fields.shared = true;
+                    fields.shared = fields.flags & 2;
+
                     if (fields.shared && !options.sharedMemory) this.parseError('Shared memory is not supported by current options');
                     if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
 
@@ -51,8 +57,10 @@ class TypeSectionParser extends WASMReader {
                 }
                 case "global": {
                     const type = this.readTypeEnc();
+
                     importDef.fields.type = type;
                     importDef.fields.mutable = this.vu1();
+
                     break;
                 }
                 default:

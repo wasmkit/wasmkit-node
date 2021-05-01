@@ -5,21 +5,20 @@ const Instruction = require('./instruction');
 
 class WASMReader extends Reader {
     readTypeEnc() {
-        let code = this.u8();
+        const code = this.u8();
+        const name = TYPE_ENC[code];
 
-        let name = TYPE_ENC[code];
         if (!name) {
             throw new SyntaxError('Invalid Type Encoding ' + (this.buffer[this.at - 1]).toString(16));
         }
         return name
     }
     readInitializer() {
-        // if (this.readInstruction) throw new Error('Update this code');
-
         const instruction = this.readInstruction();
 
+        // All instantiations end with an ending op
         if (instruction.opcode === OPCODE.END) return null;
-        if (this.readInstruction().opcode !== OPCODE.END) this.parseError('Expected 0x0B `end` after instantiation time initializor');
+        if (this.readInstruction().opcode !== OPCODE.END) this.parseError('Expected 0x0B `end` to terminate instantiation time initializor');
 
         return instruction;
     }

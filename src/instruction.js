@@ -1,10 +1,11 @@
 const { OPCODE } = require('./const');
 
-const valuedOps = [OPCODE.I32_CONST, OPCODE.F32_CONST, OPCODE.F64_CONST, OPCODE.I64]
+const valuedOps = [OPCODE.I32_CONST, OPCODE.F32_CONST, OPCODE.F64_CONST, OPCODE.I64];
 class Instruction {
     static readFrom(reader) {
         const op = reader.u8();
         let immediates = [];
+
         switch (op) {
             case OPCODE.BLOCK:
                 immediates.push(reader.readTypeEnc());
