@@ -2,7 +2,7 @@ const WASMReader = require('../wasm_reader');
 // For reference: github.com/sunfishcode/wasm-reference-manual/blob/master/WebAssembly.md#import-section
 const { EXTERNAL_KIND, TABLE_ELEM_TYPES } = require('../const')
 
-class TypeSectionParser extends WASMReader {
+class ImportSectionParser extends WASMReader {
     constructor(buffer, options = {}) {
         super(buffer);
 
@@ -13,7 +13,7 @@ class TypeSectionParser extends WASMReader {
             const importDef = {
                 moduleName: this.string(),
                 exportName: this.string(),
-                kind: EXTERNAL_KIND[this.vu7()],
+                kind: EXTERNAL_KIND[this.u8()],
                 fields: {},
             }
 
@@ -76,4 +76,4 @@ class TypeSectionParser extends WASMReader {
 
 }
 
-module.exports = TypeSectionParser;
+module.exports = ImportSectionParser;

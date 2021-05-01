@@ -13,7 +13,7 @@ class ExportSectionParser extends WASMReader {
         const wasmExports = this.array(() => {
             return {
                 name: this.string(),
-                kind: EXTERNAL_KIND[this.vu7()],
+                kind: EXTERNAL_KIND[this.u8()],
                 index: this.vu32()
             }
         });
