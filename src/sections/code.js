@@ -7,7 +7,7 @@ class CodeSectionParser extends WASMReader {
         this.options = typeof options !== 'object' ? {} : options;
     }
     parse(options = this.options) {
-        const bodies = this.array((i) => {
+        const bodies = this.array(() => {
             const bodyBytes = this.byteArray();
 
             const codeReader = new WASMReader(bodyBytes);
@@ -17,6 +17,7 @@ class CodeSectionParser extends WASMReader {
             }).flat();
 
             const instructions = [];
+
             while (codeReader.at < codeReader.buffer.byteLength) {
                 instructions.push(codeReader.readInstruction());
             };
