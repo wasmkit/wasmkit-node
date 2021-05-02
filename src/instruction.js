@@ -57,118 +57,118 @@ class Instruction {
                 break;
             case OPCODE.I32_LOAD:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_LOAD:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.F32_LOAD:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.F64_LOAD:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I32_LOAD8_S:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I32_LOAD8_U:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I32_LOAD16_S:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I32_LOAD16_U:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_LOAD8_S:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_LOAD8_U:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_LOAD16_S:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_LOAD16_U:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_LOAD32_S:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_LOAD32_U:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I32_STORE:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_STORE:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.F32_STORE:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.F64_STORE:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I32_STORE8:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I32_STORE16:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_STORE8:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_STORE16:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.I64_STORE32:
                 immediates = {};
-                immediates.align = immediates[0];
-                immediates.offset = immediates[1];
+                immediates.align = reader.vu32();
+                immediates.offset = reader.vu32();
                 break;
             case OPCODE.MEMORY_SIZE:
                 immediates.push(reader.u8());
@@ -199,7 +199,7 @@ class Instruction {
         this.opcode = opcode;
         this.immediates = immediates;
 
-        if (valuedOps.indexOf(opcode) !== -1) this.value = immediates[0] ?? null;
+        if (valuedOps.indexOf(opcode) !== -1) this.value = immediates[0];
     }
 }
 
