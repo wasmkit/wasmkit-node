@@ -1,7 +1,7 @@
 const fs = require("fs");
 const WASMParser = require('..');
 
-const testWasm = Uint8Array.from(fs.readFileSync(__dirname + '/test.wasm'));
+const testWasm = Uint8Array.from(fs.readFileSync(__dirname + '/florrio.wasm'));
 
 console.log('Valid wasm? ' + (WebAssembly.validate(testWasm)) ? 'yes' : 'no');
 
@@ -14,4 +14,4 @@ for (let section of wasm.sections) {
 }
 
 
-console.log(wasm.getSection(0x0A).data[0].instructions)
+console.log(wasm.getSection(0x02).data.slice(176))
