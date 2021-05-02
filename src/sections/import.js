@@ -19,7 +19,7 @@ class ImportSectionParser extends WASMReader {
 
             switch (importDef.kind) {
                 case "func": {
-                    importDef.fields.sigIndex = this.vu32();
+                    importDef.fields.typeIndex = this.vu32();
                     break;
                 }
                 case "table": {
