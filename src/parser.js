@@ -4,7 +4,7 @@ const { SECTIONS } = require('./const');
 
 
 class WASMParser extends WASMReader {
-    parse() {
+    parse(options = {}) {
         this.at = 0;
         this.size = this.buffer.byteLength;
 
@@ -39,7 +39,7 @@ class WASMParser extends WASMReader {
                 }
 
                 // A specific parser for each section
-                const parser = new SectionParsers[name](bytes);
+                const parser = new SectionParsers[name](bytes, options);
 
                 wasm.sections.push({
                     id,

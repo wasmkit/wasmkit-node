@@ -27,11 +27,11 @@ class ImportSectionParser extends WASMReader {
 
                     if (!TABLE_ELEM_TYPES.includes(type)) this.parseError('Invalid element type `' + type + '` for table');
 
-                    importDef.fields.elementType = type;
+                    importDef.type = type;
 
                     const fields = {
                         flags: this.vu32(),
-                        initial: this.vu32()
+                        initial: this.vu32(),
                     }
 
                     if (fields.flags & 1) fields.maximum = this.vu32();
@@ -50,7 +50,7 @@ class ImportSectionParser extends WASMReader {
                     fields.shared = fields.flags & 2;
 
                     if (fields.shared && !options.sharedMemory) this.parseError('Shared memory is not supported by current options');
-                    if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
+                    if (fields.initial > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
 
                     importDef.fields = fields;
                     break;

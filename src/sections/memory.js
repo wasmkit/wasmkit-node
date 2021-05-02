@@ -14,7 +14,11 @@ class LinearMemorySectionParser extends WASMReader {
             }
 
             if (fields.flags & 1) fields.maximum = this.vu32();
-            if (fields.minimum > fields.maximum) return this.parseError('fields limit minimum MUST be less than the maximum');
+            fields.shared = fields.flags & 2;
+
+            if (fields.shared && !options.sharedMemory) this.parseError('Shared memory is not supported by current options');
+
+            if (fields.initial > fields.maximum) return this.parseError('Memory initial MUST be less than the maximum');
 
             return fields
         });
