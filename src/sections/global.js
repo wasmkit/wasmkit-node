@@ -10,7 +10,7 @@ class GlobalSectionParser extends WASMReader {
     parse(options = this.options) {
         const globals = this.array(() => {
             const global = {
-                desc: { type: this.readTypeEnc(), mutable: this.vu1() },
+                fields: { type: this.readTypeEnc(), mutable: this.vu1() },
                 initial: this.readInitializer()
             };
 
