@@ -14,12 +14,12 @@ class ImportSectionParser extends WASMReader {
                 moduleName: this.string(),
                 exportName: this.string(),
                 kind: EXTERNAL_KIND[this.u8()],
-                fields: {},
+                data: {},
             }
 
             switch (importDef.kind) {
                 case "func": {
-                    importDef.fields.typeIndex = this.vu32();
+                    importDef.data.typeIndex = this.vu32();
                     break;
                 }
                 case "table": {
@@ -27,39 +27,38 @@ class ImportSectionParser extends WASMReader {
 
                     if (!TABLE_ELEM_TYPES.includes(type)) this.parseError('Invalid element type `' + type + '` for table');
 
-                    importDef.type = type;
-
-                    const fields = {
+                    const data = {
                         flags: this.vu32(),
                         initial: this.vu32(),
+                        type,
                     }
 
-                    if (fields.flags & 1) fields.maximum = this.vu32();
-                    if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
+                    if (data.flags & 1) data.maximum = this.vu32();
+                    if (data.minimum > data.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
 
-                    importDef.fields = fields;
+                    importDef.data = data;
                     break;
                 }
                 case "memory": {
-                    const fields = {
+                    const data = {
                         flags: this.vu32(),
                         initial: this.vu32()
                     }
 
-                    if (fields.flags & 1) fields.maximum = this.vu32();
-                    fields.shared = fields.flags & 2;
+                    if (data.flags & 1) data.maximum = this.vu32();
+                    data.shared = data.flags & 2;
 
-                    if (fields.shared && !options.sharedMemory) this.parseError('Shared memory is not supported by current options');
-                    if (fields.initial > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
+                    if (data.shared && !options.sharedMemory) this.parseError('Shared memory is not supported by current options');
+                    if (data.initial > data.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
 
-                    importDef.fields = fields;
+                    importDef.data = data;
                     break;
                 }
                 case "global": {
                     const type = this.readTypeEnc();
 
-                    importDef.fields.type = type;
-                    importDef.fields.mutable = this.vu1();
+                    importDef.data.type = type;
+                    importDef.data.mutable = this.vu1();
 
                     break;
                 }

@@ -10,13 +10,11 @@ class ExportSectionParser extends WASMReader {
         this.options = typeof options !== 'object' ? {} : options;
     }
     parse(options = this.options) {
-        const wasmExports = this.array(() => {
-            return {
-                name: this.string(),
-                kind: EXTERNAL_KIND[this.u8()],
-                index: this.vu32()
-            }
-        });
+        const wasmExports = this.array(() => ({
+            name: this.string(),
+            kind: EXTERNAL_KIND[this.u8()],
+            index: this.vu32()
+        }));
 
         return wasmExports;
     }

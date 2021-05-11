@@ -11,20 +11,19 @@ class TableSectionParser extends WASMReader {
     }
     parse(options = this.options) {
         const tableDescriptors = this.array(() => {
-            const type = this.readTypeEnc();
-
-            if (!TABLE_ELEM_TYPES.includes(type)) this.parseError('Invalid element type `' + type + '` for table');
-            const fields = {
-                flags: this.vu32(),
-                initial: this.vu32()
+            const data = {
+                type: this.readTypeEnc(),
             }
-            if (fields.flags & 1) fields.maximum = this.vu32();
-            if (fields.minimum > fields.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
 
-            return {
-                fields,
-                type
-            }
+            if (!TABLE_ELEM_TYPES.includes(data.type)) this.parseError('Invalid element type `' + data.type + '` for table');
+
+            data.flags = this.vu32();
+            data.initial = this.vu32();
+
+            if (data.flags & 1) data.maximum = this.vu32();
+            if (data.minimum > data.maximum) this.parseError('Resizable limit minimum MUST be less than the maximum');
+
+            return data;
         });
 
         return tableDescriptors;
