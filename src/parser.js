@@ -1,9 +1,11 @@
 const WASMReader = require('./wasm_reader');
 const SectionParsers = require('./sections');
 const { SECTIONS } = require('./const');
-
+const Instruction = require('./instruction.js');
 
 class WASMParser extends WASMReader {
+    static Instruction = Instruction;
+    
     parse(options = {}) {
         this.at = 0;
         this.size = this.buffer.byteLength;
