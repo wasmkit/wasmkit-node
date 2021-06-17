@@ -22,7 +22,7 @@ class Reader {
 
         return {
             encode(...args) {
-                return Encoder.encode.apply(Endoer, args);
+                return Encoder.encode.apply(Encoder, args);
             },
             decode(...args) {
                 return Decoder.decode.apply(Decoder, args);
