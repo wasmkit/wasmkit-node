@@ -5,6 +5,7 @@ const Instruction = require('./instruction.js');
 
 class WASMParser extends WASMReader {
     static Instruction = Instruction;
+    static SECTIONS = SECTIONS;
     
     parse(options = {}) {
         this.at = 0;
