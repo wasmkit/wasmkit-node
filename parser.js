@@ -498,7 +498,7 @@ function parseWASM(buffer, options=defaultOptions) {
         const size = reader.vu32();
 
         if (!options.sections.includes(id)) {
-            this.at += size;
+            reader.at += size;
 
             continue;
         }
