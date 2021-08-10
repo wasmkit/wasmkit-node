@@ -16,6 +16,7 @@ type Function = {
     signatureIndex: number;
 };
 type Table = {
+    elementType: "funcref";
     initial: number;
     maximum?: number;
 };
