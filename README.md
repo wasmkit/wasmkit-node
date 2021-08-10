@@ -1,9 +1,7 @@
 # wasm-parser
 
-Reads and parses .wasm files. Written in javascript
+Lightweight Web Assembly binary reader and parser. Made for quick use in the web and on node
 
 ```js
-const p = new Parser(buffer);
-
-const wasm = p.parse();
+const wasm = parseWASM(binary);
 ```
