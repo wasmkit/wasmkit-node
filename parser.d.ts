@@ -55,7 +55,7 @@ type Data = {
     data: Uint8Array;
 }
 
-type Immediates = { value: number } | { signature: valueType } | 
+type Immediates = { value: number | bigint } | { signature: valueType } | 
     { id: number } | { depth: number } |
     { depthTable: number[]; defaultDepth: number } | { callee: number } |
     { signatureIndex: number; reserved: number } | { reserved: number } | 

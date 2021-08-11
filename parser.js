@@ -299,10 +299,10 @@ class Instruction {
                 immediates.reserved = reader.uint8();
                 break;
             case OP.I32_CONST:
-                immediates.value = reader.vu32();
+                immediates.value = reader.vs32();
                 break;
             case OP.I64_CONST:
-                immediates.value = reader.vu64();
+                immediates.value = reader.vs64();
                 break;
             case OP.F32_CONST:
                 immediates.value = reader.float()
@@ -397,6 +397,24 @@ class Reader {
 
         return out;
     }
+    vs32() {
+        let i = 0;
+        let out = 0;
+        while (true) {
+          const byte = this.buffer[this.at++];
+
+          out |= (byte & 0x7f) << i;
+          i += 7;
+
+          if ((0x80 & byte) === 0) {
+            if (i < 32 && (byte & 0x40) !== 0) {
+              return out | (~0 << i);
+            }
+
+            return out
+          }
+        }
+    }
 
     vu64() {
         let i = 0n;
@@ -408,6 +426,25 @@ class Reader {
         out |= BigInt(this.buffer[this.at++] & 0x7F) << i;
 
         return out;
+    }
+
+    vs64() {
+        let i = 0n;
+        let out = 0n;
+        while (true) {
+          const byte = this.buffer[this.at++];
+
+          out |= BigInt(byte & 0x7F) << i;
+          i += 7n;
+
+          if ((0x80 & byte) === 0) {
+            if (i < 128n && (byte & 0x40) !== 0) {
+              return out | (~0n << i);
+            }
+
+            return out
+          }
+        }
     }
 
     byteArray(length = this.vu32()) {// Elements are bytes
@@ -463,8 +500,8 @@ function parseWASM(buffer, options=defaultOptions) {
 
     const reader = new Reader(buffer);
     
-    const magic = reader.string(4);
-    if (magic !== "\00asm") return reader.reject("Invalid magic");
+    const magic = Reader.endianSwap(reader.uint32())
+    if (magic !== 0x0061736D) return reader.reject("Invalid magic");
 
     const version = reader.uint32();
     if (version !== 1) return reader.reject('Unsupported version');
