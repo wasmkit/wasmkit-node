@@ -266,7 +266,7 @@ declare class Instruction {
 
     opcode: number;
     opstr: string;
-    immediates: Immediatesy;
+    immediates: Immediates;
 }
 
 declare class Reader {
