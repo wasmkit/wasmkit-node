@@ -8,7 +8,7 @@ type Signature = {
     params: variableValueType[];
     results: variableValueType[];
 };
-type Import = { moduleName: string; exportName: string; } & (({ kind: "func" } & Function) |
+type Import = { moduleName: string; exportName: string; } & (({ kind: "func" } & WasmFunction) |
     ({ kind: "table" } & Table) |
     ({ kind: "memory" } & Memory) |
     ({ kind: "global" } & Global));
@@ -307,13 +307,13 @@ interface ParsedWASM {
         customs: Record<string, Uint8Array>;
         signature: null | Signature[];
         import: null | Import[];
-        function: null | Function[];
+        function: null | WasmFunction[];
         table: null | Table[];
         memory: null | Memory[];
         global: null | Global[];
         export: null | Export[];
         start: null | Start;
-        element: null | Element[];
+        element: null | WasmElement[];
         code: null | CodeBody[];
         data: null | Data[];
         dataCount: Uint8Array;
