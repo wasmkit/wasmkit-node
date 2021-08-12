@@ -63,7 +63,7 @@ type Immediates = { value: number | bigint } | { signature: valueType } |
 
 type kind = "func" | "table" | "memory" | "global";
 
-enum SECTION {
+declare enum SECTION {
     CUSTOM,
     SIGNATURE,
     IMPORT,
