@@ -817,11 +817,14 @@ function parseWASM(buffer, options=defaultOptions) {
     };
 }
 
-parseWASM.OP = OP;
-parseWASM.SECTION = SECTION;
-parseWASM.Reader = Reader;
-parseWASM.Instruction = Instruction;
+const WASMParser = {
+    OP,
+    SECTION,
+    Reader,
+    Instruction,
+    parseWASM
+}
 
-if (typeof window !== "undefined") window.parseWASM = parseWASM;
-else if (typeof module !== "undefined") module.exports = parseWASM;
-else globalThis.parseWASM = parseWASM;
+if (typeof window !== "undefined") window.WASMParser = WASMParser;
+else if (typeof module !== "undefined") module.exports = WASMParser;
+else globalThis.WASMParser = WASMParser;

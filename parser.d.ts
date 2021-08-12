@@ -12,7 +12,7 @@ type Import = { moduleName: string; exportName: string; } & (({ kind: "func" } &
     ({ kind: "table" } & Table) |
     ({ kind: "memory" } & Memory) |
     ({ kind: "global" } & Global));
-type Function = {
+type WasmFunction = {
     signatureIndex: number;
 };
 type Table = {
@@ -40,7 +40,7 @@ type Export = {
     kind: kind;
     index: number;
 }
-type Element = {
+type WasmElement = {
     index: number;
     offset: Instruction | null;
     elems: number[]
@@ -301,7 +301,7 @@ declare class Reader {
     reject(msg: string): void;
 }
 
-export function parseWASM(buffer: BufferResolvable, options?: {
+declare function parseWASM(buffer: BufferResolvable, options?: {
     multiResult: boolean;
     sharedMemory: boolean;
     mutableGlobals: boolean;
@@ -325,7 +325,8 @@ export function parseWASM(buffer: BufferResolvable, options?: {
     };
 };
 
-export namespace parseWASM {
+export namespace WASMParser {
+    export { parseWASM }
     export { OP };
     export { SECTION };
     export { Reader };
