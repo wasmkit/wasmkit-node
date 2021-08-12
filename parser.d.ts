@@ -301,12 +301,7 @@ declare class Reader {
     reject(msg: string): void;
 }
 
-declare function parseWASM(buffer: BufferResolvable, options?: {
-    multiResult: boolean;
-    sharedMemory: boolean;
-    mutableGlobals: boolean;
-    sections: SECTION[];
-}): {
+interface ParsedWASM {
     version: number;
     sections: {
         customs: Record<string, Uint8Array>;
@@ -323,7 +318,14 @@ declare function parseWASM(buffer: BufferResolvable, options?: {
         data: null | Data[];
         dataCount: Uint8Array;
     };
-};
+}
+
+declare function parseWASM(buffer: BufferResolvable, options?: {
+    multiResult: boolean;
+    sharedMemory: boolean;
+    mutableGlobals: boolean;
+    sections: SECTION[];
+}): ParsedWASM;
 
 export namespace WASMParser {
     export { parseWASM }
