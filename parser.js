@@ -823,5 +823,5 @@ parseWASM.Reader = Reader;
 parseWASM.Instruction = Instruction;
 
 if (typeof window !== "undefined") window.parseWASM = parseWASM;
-else if (typeof module !== "undefined") module.exports.parseWASM = parseWASM;
+else if (typeof module !== "undefined") module.exports = parseWASM;
 else globalThis.parseWASM = parseWASM;
