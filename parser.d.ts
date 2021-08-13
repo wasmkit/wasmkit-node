@@ -55,7 +55,31 @@ type Data = {
     data: Uint8Array;
 }
 
-type CustomNameSection = {};
+type NameSubSection = {
+        id: 0;
+        kind: "module";
+        size: number;
+        value: string;
+    } | {
+        id: 1;
+        kind: "function";
+        size: number;
+        value: {
+            index: number;
+            name: string;
+        }[]
+    } | {
+        id: 2;
+        kind: "local";
+        size: number;
+        value: {
+            index: number;
+            locals: {
+                id: number;
+                name: string;
+            }[]
+        }
+    };
 
 type Immediates = { value: number | bigint } | { signature: valueType } | 
     { id: number } | { depth: number } |
@@ -306,7 +330,7 @@ declare class Reader {
 interface ParsedWASM {
     version: number;
     sections: {
-        customs: Record<string, Uint8Array> & { name?: CustomNameSection | Uint8Array };
+        customs: Record<string, Uint8Array> & { name?: NameSubSection[] | Uint8Array };
         signature: null | Signature[];
         import: null | Import[];
         function: null | WasmFunction[];
@@ -323,10 +347,11 @@ interface ParsedWASM {
 }
 
 declare function parseWASM(buffer: BufferResolvable, options?: {
-    multiResult: boolean;
-    sharedMemory: boolean;
-    mutableGlobals: boolean;
-    sections: SECTION[];
+    multiResult?: boolean;
+    sharedMemory?: boolean;
+    mutableGlobals?: boolean;
+    sections?: SECTION[];
+    parseCustoms?: boolean;
 }): ParsedWASM;
 
 export namespace WASMParser {

@@ -56,6 +56,11 @@ KIND[KIND.TABLE  = 0x01] = "table";
 KIND[KIND.MEMORY = 0x02] = "memory";
 KIND[KIND.GLOBAL = 0x03] = "global";
 
+const NAME_SUBSECTION = {};
+NAME_SUBSECTION[NAME_SUBSECTION.MODULE   = 0] = "module";
+NAME_SUBSECTION[NAME_SUBSECTION.FUNCTION = 1] = "function";
+NAME_SUBSECTION[NAME_SUBSECTION.LOCAL    = 2] = "local";
+
 // op code property naming conventions from WAIL (github.com/Qwokka/WAIL)
 const OP = {}
 OP[OP.UNREACHABLE         = 0x00] = "unreachable";
@@ -479,19 +484,81 @@ class Reader {
         return instruction;
     }
 
-    reject(msg) {
+    reject(msg, buffer="wasm") {
         const hexOffset = this._previous.toString(16);
         const displayOffset = hexOffset.padStart(hexOffset.length + (hexOffset.length % 2), "0");
 
-        throw new TypeError(`${msg} <@${displayOffset} wasm>`)
+        throw new SyntaxError(`${msg} <@${displayOffset} ${buffer}>`)
     }
 }
 
 const KNOWN_CUSTOMS = ['name'];
+
 function parseCustomSection(sectionName, bytes) {
     if (!KNOWN_CUSTOMS.includes(sectionName)) throw new Error("Unknown Custom Section");
 
-    throw "WIP";
+    const reader = new Reader(bytes);
+
+    switch (sectionName) {
+        case "name": {
+            const nameData = []
+
+            while (reader._at < reader.buffer.byteLength) {
+                const subSection = {}
+                
+                subSection.id = reader.uint8();
+                subSection.size = reader.vu32();
+
+                switch (subSection.id) {
+                    case NAME_SUBSECTION.MODULE:
+                        subSection.kind = "module";
+                        subSection.value = reader.string();
+                        break;
+                    case NAME_SUBSECTION.FUNCTION:
+                        subSection.kind = "function";
+                        subSection.value = reader.array(() => {
+                            const index = reader.vu32();
+                            const name = reader.string();
+
+                            return {
+                                index,
+                                name
+                            }
+                        });
+                        break;
+                    case NAME_SUBSECTION.LOCAL:
+                        subSection.kind = "local";
+                        
+                        subSection.value = reader.array(() => {
+                            const index = reader.vu32();
+                            const locals = reader.array(() => {
+                                const id = reader.vu32();
+                                const name = reader.string();
+
+                                return {
+                                    id,
+                                    name
+                                }
+                            });
+
+                            return {
+                                index,
+                                locals
+                            }
+                        });
+                        break;
+                    default:
+                        return reader.reject("Invalid subsection", "custom:name");
+                }
+                
+                nameData.push(subSection);
+            }
+
+            return nameData
+        }
+        default:
+            throw new Error("Unknown Custom Section")
+    }
 }
 
 const defaultOptions = {
@@ -499,7 +566,7 @@ const defaultOptions = {
     sharedMemory: true,
     mutableGlobals: true,
     sections: [SECTION.CUSTOM, SECTION.SIGNATURE, SECTION.IMPORT, SECTION.FUNCTION, SECTION.TABLE, SECTION.MEMORY, SECTION.GLOBAL, SECTION.EXPORT, SECTION.START, SECTION.ELEMENT, SECTION.CODE, SECTION.DATA],
-    parseKnownCustoms: false
+    parseCustoms: false
 };
 
 function parseWASM(buffer, options=defaultOptions) {
@@ -558,7 +625,7 @@ function parseWASM(buffer, options=defaultOptions) {
                 const sectionBytes = reader.byteArray(size - (reader._at - start));
 
                 // Reallocate to prevent modification
-                if (!options.parseKnownCustoms || !KNOWN_CUSTOMS.includes(name)) {
+                if (!options.parseCustoms || !KNOWN_CUSTOMS.includes(name)) {
                     sections.customs[name] = sectionBytes.slice(0);
                 } else {
                     try {
