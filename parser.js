@@ -56,6 +56,7 @@ KIND[KIND.TABLE  = 0x01] = "table";
 KIND[KIND.MEMORY = 0x02] = "memory";
 KIND[KIND.GLOBAL = 0x03] = "global";
 
+// op code property naming conventions from WAIL
 const OP = {}
 OP[OP.UNREACHABLE         = 0x00] = "unreachable";
 OP[OP.NOP                 = 0x01] = "nop";
