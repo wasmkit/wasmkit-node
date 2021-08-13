@@ -102,7 +102,6 @@ declare enum SECTION {
     ELEMENT,
     CODE,
     DATA,
-    DATACOUNT,
 }
 
 declare namespace OP {
@@ -342,7 +341,6 @@ interface ParsedWASM {
         element: null | WasmElement[];
         code: null | CodeBody[];
         data: null | Data[];
-        dataCount: Uint8Array;
     };
 }
 

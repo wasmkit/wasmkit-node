@@ -35,9 +35,8 @@ SECTION[SECTION.START     = 8] = "start";
 SECTION[SECTION.ELEMENT   = 9] = "element";
 SECTION[SECTION.CODE      = 10] = "code";
 SECTION[SECTION.DATA      = 11] = "data";
-SECTION[SECTION.DATACOUNT = 12] = "dataCount";
 
-const MAX_SECTION_ID = SECTION.DATACOUNT;
+const MAX_SECTION_ID = SECTION.DATA;
 
 const VALUE_TYPE = {};
 VALUE_TYPE[VALUE_TYPE.I32      = 0x7f] = "i32";
@@ -595,7 +594,6 @@ function parseWASM(buffer, options=defaultOptions) {
         element: null,
         code: null,
         data: null,
-        dataCount: null,
     }
     
     let lastSection = -1;
@@ -603,7 +601,7 @@ function parseWASM(buffer, options=defaultOptions) {
     while (reader._at < reader.buffer.byteLength) {
         const id = reader.uint8();
 
-        if (id !== SECTION.DATACOUNT && id !== SECTION.CUSTOM && lastSection >= id) return reader.reject(`Section 0x${id.toString(16).padStart(2, "0")} following 0x${lastSection.toString(16).padStart(2, "0")} out of order`);
+        if (id !== SECTION.CUSTOM && lastSection >= id) return reader.reject(`Section 0x${id.toString(16).padStart(2, "0")} following 0x${lastSection.toString(16).padStart(2, "0")} out of order`);
         lastSection = id;
 
         if (id > MAX_SECTION_ID) return reader.reject("Invalid section");
@@ -638,10 +636,13 @@ function parseWASM(buffer, options=defaultOptions) {
             }
             case SECTION.SIGNATURE: {
                 sections.signature = reader.array((index) => {
+                    const signature = {};
+                    signature.index = index;
+
                     const form = reader.uint8();
                     if (form !== VALUE_TYPE.FUNC) return reader.reject('Invalid form ' + VALUE_TYPE[form]);
         
-                    const params = reader.array(() => {
+                    signature.params = reader.array(() => {
                         const valueType = reader.uint8();
 
                         if (!VARIABLE_TYPES.includes(valueType)) return reader.reject('Invalid parameter type ' + VALUE_TYPE[valueType]);
@@ -652,7 +653,7 @@ function parseWASM(buffer, options=defaultOptions) {
                     // Length of results should always be one or zero, unless multiple results is allowed
                     if (reader.buffer[reader._at] > 1 && !options.multiResult) return reader.reject('Multiple results are unsupported by current options');
         
-                    const results = reader.array(() => {
+                    signature.results = reader.array(() => {
                         const valueType = reader.uint8();
 
                         if (!VARIABLE_TYPES.includes(valueType)) return reader.reject('Invalid result type ' + VALUE_TYPE[valueType]);
@@ -660,11 +661,7 @@ function parseWASM(buffer, options=defaultOptions) {
                         return VALUE_TYPE[valueType];
                     });
         
-                    return {
-                        index,
-                        params,
-                        results
-                    }
+                    return signature;
                 });
                 break;
             }
@@ -750,9 +747,11 @@ function parseWASM(buffer, options=defaultOptions) {
             }
             case SECTION.FUNCTION: {
                 sections.function = reader.array(() => {
-                    return {
-                        signatureIndex: reader.vu32()
-                    }
+                    const wasmFunction = {}
+                    
+                    wasmFunction.signatureIndex = reader.vu32();
+                    
+                    return wasmFunction;
                 });
                 break;
             }
@@ -783,7 +782,6 @@ function parseWASM(buffer, options=defaultOptions) {
             case SECTION.MEMORY: {
                 sections.memory = reader.array(() => {
                     const memory = {};
-
                     const flags = reader.vu32();
 
                     memory.initial = reader.vu32();
@@ -830,11 +828,15 @@ function parseWASM(buffer, options=defaultOptions) {
                 break;
             }
             case SECTION.EXPORT: {
-                sections.export = reader.array(() => ({
-                    name: reader.string(),
-                    kind: KIND[reader.uint8()],
-                    index: reader.vu32()
-                }));
+                sections.export = reader.array(() => {
+                    const wasmExport = {};
+
+                    wasmExport.name = reader.string();
+                    wasmExport.kind = KIND[reader.uint8()];
+                    wasmExport.index = reader.vu32();
+
+                    return wasmExport;
+                });
                 break;
             }
             case SECTION.START: {
@@ -844,18 +846,23 @@ function parseWASM(buffer, options=defaultOptions) {
                 break;
             }
             case SECTION.ELEMENT: {
-                sections.element = reader.array(() => ({
-                    index: reader.vu32(),
-                    offset: reader.readInitializer(),
-                    elems: reader.array(() => reader.vu32())
-                }));
+                sections.element = reader.array(() => {
+                    const wasmElement = {};
+                    
+                    wasmElement.index = reader.vu32();
+                    wasmElement.offset = reader.readInitializer();
+                    wasmElement.elems = reader.array(() => reader.vu32());
+
+                    return wasmElement;
+                });
                 break;
             }
             case SECTION.CODE: {
                 sections.code = reader.array(() => {
+                    const codeBody = {};
                     const bodyEnd = reader.vu32() + reader._at;
         
-                    const locals = reader.array(() => {
+                    codeBody.locals = reader.array(() => {
                         const len = reader.vu32();
                         const valueType = reader.uint8();
 
@@ -872,24 +879,23 @@ function parseWASM(buffer, options=defaultOptions) {
         
                     if (!instructions[instructions.length - 1]) return reader.reject('No function body');
                     if (instructions[instructions.length - 1].opcode !== OP.END) return reader.reject('Expected end opcode to terminate instruction array');
-        
-                    return {
-                        locals,
-                        instructions
-                    }
+                    
+                    codeBody.instructions = instructions;
+                    
+                    return codeBody;
                 });
                 break;
             }
             case SECTION.DATA: {
-                sections.data = reader.array(() => ({
-                    index: reader.vu32(), // memory specified
-                    offset: reader.readInitializer(),
-                    data: reader.byteArray().slice(0)
-                }));
-                break;
-            }
-            case SECTION.DATACOUNT: {
-                sections.dataCount = reader.byteArray(size);
+                sections.data = reader.array(() => {
+                    const data = {};
+
+                    data.index = reader.vu32(); // memory specified
+                    data.offset = reader.readInitializer();
+                    data.data = reader.byteArray().slice(0);
+
+                    return data;
+                });
                 break;
             }
             default: // this shouldn't run due to the earlier check... but its here anyway
