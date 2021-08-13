@@ -487,11 +487,19 @@ class Reader {
     }
 }
 
+const KNOWN_CUSTOMS = ['name'];
+function parseCustomSection(sectionName, bytes) {
+    if (!KNOWN_CUSTOMS.includes(sectionName)) throw new Error("Unknown Custom Section");
+
+    throw "WIP";
+}
+
 const defaultOptions = {
     multiResult: true,
     sharedMemory: true,
     mutableGlobals: true,
-    sections: [SECTION.CUSTOM, SECTION.SIGNATURE, SECTION.IMPORT, SECTION.FUNCTION, SECTION.TABLE, SECTION.MEMORY, SECTION.GLOBAL, SECTION.EXPORT, SECTION.START, SECTION.ELEMENT, SECTION.CODE, SECTION.DATA]
+    sections: [SECTION.CUSTOM, SECTION.SIGNATURE, SECTION.IMPORT, SECTION.FUNCTION, SECTION.TABLE, SECTION.MEMORY, SECTION.GLOBAL, SECTION.EXPORT, SECTION.START, SECTION.ELEMENT, SECTION.CODE, SECTION.DATA],
+    parseKnownCustoms: false
 };
 
 function parseWASM(buffer, options=defaultOptions) {
@@ -547,8 +555,18 @@ function parseWASM(buffer, options=defaultOptions) {
 
                 const name = reader.string();
 
+                const sectionBytes = reader.byteArray(size - (reader._at - start));
+
                 // Reallocate to prevent modification
-                sections.customs[name] = reader.byteArray(size - (reader._at - start)).slice(0);
+                if (!options.parseKnownCustoms || !KNOWN_CUSTOMS.includes(name)) {
+                    sections.customs[name] = sectionBytes.slice(0);
+                } else {
+                    try {
+                        sections.customs[name] = parseCustomSection(name, sectionBytes);
+                    } catch {
+                        sections.customs[name] = sectionBytes.slice(0);
+                    }
+                }
                 break;
             }
             case SECTION.SIGNATURE: {

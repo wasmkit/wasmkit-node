@@ -55,6 +55,8 @@ type Data = {
     data: Uint8Array;
 }
 
+type CustomNameSection = {};
+
 type Immediates = { value: number | bigint } | { signature: valueType } | 
     { id: number } | { depth: number } |
     { depthTable: number[]; defaultDepth: number } | { callee: number } |
@@ -304,7 +306,7 @@ declare class Reader {
 interface ParsedWASM {
     version: number;
     sections: {
-        customs: Record<string, Uint8Array>;
+        customs: Record<string, Uint8Array> & { name?: CustomNameSection | Uint8Array };
         signature: null | Signature[];
         import: null | Import[];
         function: null | WasmFunction[];
