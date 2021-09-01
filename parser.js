@@ -547,7 +547,9 @@ function parseCustomSection(sectionName, bytes) {
                         });
                         break;
                     default:
-                        return reader.reject("Invalid subsection", "custom:name");
+//                      return reader.reject("Invalid subsection", "custom:name");
+                        reader.at += subSection.size;
+                        break;
                 }
                 
                 nameData.push(subSection);
