@@ -35,8 +35,10 @@ SECTION[SECTION.START     = 8] = "start";
 SECTION[SECTION.ELEMENT   = 9] = "element";
 SECTION[SECTION.CODE      = 10] = "code";
 SECTION[SECTION.DATA      = 11] = "data";
+SECTION[SECTION.DATACOUNT = 12] = "dataCount";
+SECTION[SECTION.TAG       = 13] = "tag";
 
-const MAX_SECTION_ID = SECTION.DATA;
+const MAX_SECTION_ID = SECTION.TAG;
 
 const VALUE_TYPE = {};
 VALUE_TYPE[VALUE_TYPE.I32      = 0x7f] = "i32";
@@ -586,6 +588,7 @@ const defaultOptions = {
     multiResult: true,
     sharedMemory: true,
     mutableGlobals: true,
+    // no datacount or tag as those are still experimental
     sections: [SECTION.CUSTOM, SECTION.SIGNATURE, SECTION.IMPORT, SECTION.FUNCTION, SECTION.TABLE, SECTION.MEMORY, SECTION.GLOBAL, SECTION.EXPORT, SECTION.START, SECTION.ELEMENT, SECTION.CODE, SECTION.DATA],
     parseCustoms: false
 };
@@ -616,6 +619,7 @@ function parseWASM(buffer, options=defaultOptions) {
         element: null,
         code: null,
         data: null,
+        dataCount: null
     }
     
     let lastSection = -1;
@@ -656,7 +660,7 @@ function parseWASM(buffer, options=defaultOptions) {
                 }
                 break;
             }
-            case SECTION.SIGNATURE: {
+            case SECTION.SIGNATURE:
                 sections.signature = reader.array((index) => {
                     const signature = {};
                     signature.index = index;
@@ -686,8 +690,7 @@ function parseWASM(buffer, options=defaultOptions) {
                     return signature;
                 });
                 break;
-            }
-            case SECTION.IMPORT: {
+            case SECTION.IMPORT:
                 sections.import = reader.array(() => {
                     const importDef = {}
                     
@@ -766,8 +769,7 @@ function parseWASM(buffer, options=defaultOptions) {
                     return importDef
                 });
                 break;
-            }
-            case SECTION.FUNCTION: {
+            case SECTION.FUNCTION:
                 sections.function = reader.array(() => {
                     const wasmFunction = {}
                     
@@ -776,8 +778,7 @@ function parseWASM(buffer, options=defaultOptions) {
                     return wasmFunction;
                 });
                 break;
-            }
-            case SECTION.TABLE: {
+            case SECTION.TABLE:
                 sections.table = reader.array(() => {
                     const table = {}
                     
@@ -800,8 +801,7 @@ function parseWASM(buffer, options=defaultOptions) {
                     return table;
                 });
                 break;
-            }
-            case SECTION.MEMORY: {
+            case SECTION.MEMORY:
                 sections.memory = reader.array(() => {
                     const memory = {};
                     const flags = reader.vu32();
@@ -824,8 +824,7 @@ function parseWASM(buffer, options=defaultOptions) {
                 });
         
                 break;
-            }
-            case SECTION.GLOBAL: {
+            case SECTION.GLOBAL:
                 sections.global = reader.array(() => {
                     const global = {};
 
@@ -848,8 +847,7 @@ function parseWASM(buffer, options=defaultOptions) {
                     return global;
                 });
                 break;
-            }
-            case SECTION.EXPORT: {
+            case SECTION.EXPORT:
                 sections.export = reader.array(() => {
                     const wasmExport = {};
 
@@ -860,14 +858,12 @@ function parseWASM(buffer, options=defaultOptions) {
                     return wasmExport;
                 });
                 break;
-            }
-            case SECTION.START: {
+            case SECTION.START:
                 sections.start = {
                     index: reader.vu32()
                 }
                 break;
-            }
-            case SECTION.ELEMENT: {
+            case SECTION.ELEMENT:
                 sections.element = reader.array(() => {
                     const wasmElement = {};
                     
@@ -878,8 +874,7 @@ function parseWASM(buffer, options=defaultOptions) {
                     return wasmElement;
                 });
                 break;
-            }
-            case SECTION.CODE: {
+            case SECTION.CODE:
                 sections.code = reader.array(() => {
                     const codeBody = {};
                     const bodyEnd = reader.vu32() + reader._at;
@@ -907,8 +902,7 @@ function parseWASM(buffer, options=defaultOptions) {
                     return codeBody;
                 });
                 break;
-            }
-            case SECTION.DATA: {
+            case SECTION.DATA:
                 sections.data = reader.array(() => {
                     const data = {};
 
@@ -919,7 +913,10 @@ function parseWASM(buffer, options=defaultOptions) {
                     return data;
                 });
                 break;
-            }
+            case SECTION.DATACOUNT:
+            case SECTION.TAG:
+                sections.tag = reader.byteArray(size);
+                break;
             default: // this shouldn't run due to the earlier check... but its here anyway
                 return reader.reject("Invalid section");
         }
