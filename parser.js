@@ -914,6 +914,8 @@ function parseWASM(buffer, options=defaultOptions) {
                 });
                 break;
             case SECTION.DATACOUNT:
+                sections.dataCount = reader.byteArray(size);
+                break;
             case SECTION.TAG:
                 sections.tag = reader.byteArray(size);
                 break;

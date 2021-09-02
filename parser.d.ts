@@ -55,15 +55,13 @@ type Data = {
     data: Uint8Array;
 }
 
-type NameSubSection = {
+type NameSubSection = { size: number; } & ({
         id: 0;
         kind: "module";
-        size: number;
         value: string;
     } | {
         id: 1;
         kind: "function";
-        size: number;
         value: {
             index: number;
             name: string;
@@ -71,7 +69,6 @@ type NameSubSection = {
     } | {
         id: 2;
         kind: "local";
-        size: number;
         value: {
             index: number;
             locals: {
@@ -79,13 +76,20 @@ type NameSubSection = {
                 name: string;
             }[]
         }
-    };
+    } | {
+        id: 3,
+        kind: "label",
+        raw: Uint8Array;
+    } | ({ value: { index: number; name: string }[] } &
+        ({ kind: "type"; id: 4 } | { kind: "table"; id: 5 } |
+        { kind: "memory"; id: 6 } | { kind: "global"; id: 7 } |
+        { kind: "element"; id: 8 } | { kind: "data"; id: 9 })));
 
 type Immediates = { value: number | bigint } | { signature: valueType } | 
     { id: number } | { depth: number } |
     { depthTable: number[]; defaultDepth: number } | { callee: number } |
     { signatureIndex: number; reserved: number } | { reserved: number } | 
-    { align: number; offset: number }
+    { align: number; offset: number };
 
 type kind = "func" | "table" | "memory" | "global";
 
@@ -341,6 +345,8 @@ interface ParsedWASM {
         element: null | WasmElement[];
         code: null | CodeBody[];
         data: null | Data[];
+        dataCount: null | Uint8Array;
+        tag: null | Uint8Array;
     };
 }
 
