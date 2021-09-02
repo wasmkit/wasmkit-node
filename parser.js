@@ -59,9 +59,16 @@ const NAME_SUBSECTION = {};
 NAME_SUBSECTION[NAME_SUBSECTION.MODULE   = 0] = "module";
 NAME_SUBSECTION[NAME_SUBSECTION.FUNCTION = 1] = "function";
 NAME_SUBSECTION[NAME_SUBSECTION.LOCAL    = 2] = "local";
+NAME_SUBSECTION[NAME_SUBSECTION.LABEL    = 3] = "label";
+NAME_SUBSECTION[NAME_SUBSECTION.TYPE     = 4] = "type";
+NAME_SUBSECTION[NAME_SUBSECTION.TABLE    = 5] = "table";
+NAME_SUBSECTION[NAME_SUBSECTION.MEMORY   = 6] = "memory";
+NAME_SUBSECTION[NAME_SUBSECTION.GLOBAL   = 7] = "global";
+NAME_SUBSECTION[NAME_SUBSECTION.ELEMENT  = 8] = "element";
+NAME_SUBSECTION[NAME_SUBSECTION.DATA     = 9] = "data";
 
 // op code property naming conventions from WAIL (github.com/Qwokka/WAIL)
-const OP = {}
+const OP = {};
 OP[OP.UNREACHABLE         = 0x00] = "unreachable";
 OP[OP.NOP                 = 0x01] = "nop";
 OP[OP.BLOCK               = 0x02] = "block";
@@ -365,11 +372,11 @@ class Reader {
     }
 
     uint16() {
-        return this.buffer[this._at] | (this.buffer[(this.at += 2) - 1] << 8)
+        return this.buffer[this._at] | (this.buffer[(this.at += 2) - 1] << 8);
     }
 
     uint32() {
-        return this.buffer[this._at] | (this.buffer[this._at + 1] << 8) | (this.buffer[this._at + 2] << 16) | (this.buffer[(this.at += 4) - 1] << 24)
+        return this.buffer[this._at] | (this.buffer[this._at + 1] << 8) | (this.buffer[this._at + 2] << 16) | (this.buffer[(this.at += 4) - 1] << 24);
     }
 
     int32() {
@@ -387,7 +394,7 @@ class Reader {
     }
 
     bool() {
-        return (this.buffer[this.at++] & 0x1) === 1
+        return (this.buffer[this.at++] & 0x1) === 1;
     }
 
     // LEB128s
@@ -416,7 +423,7 @@ class Reader {
               return out | (~0 << i);
             }
 
-            return out
+            return out;
           }
         }
     }
@@ -447,7 +454,7 @@ class Reader {
               return out | (~0n << i);
             }
 
-            return out
+            return out;
           }
         }
     }
@@ -487,7 +494,7 @@ class Reader {
         const hexOffset = this._previous.toString(16);
         const displayOffset = hexOffset.padStart(hexOffset.length + (hexOffset.length % 2), "0");
 
-        throw new SyntaxError(`${msg} <@${displayOffset} ${buffer}>`)
+        throw new SyntaxError(`${msg} <@${displayOffset} ${buffer}>`);
     }
 }
 
@@ -500,62 +507,75 @@ function parseCustomSection(sectionName, bytes) {
 
     switch (sectionName) {
         case "name": {
-            const nameData = []
+            const nameData = [];
 
             while (reader._at < reader.buffer.byteLength) {
-                const subSection = {}
+                const subSection = {};
                 
                 subSection.id = reader.uint8();
                 subSection.size = reader.vu32();
+                subSection.kind = NAME_SUBSECTION[subSection.id] || "unknown";
+                
+                if (subSection.size === 0) continue;
 
                 switch (subSection.id) {
                     case NAME_SUBSECTION.MODULE:
-                        subSection.kind = "module";
                         subSection.value = reader.string();
                         break;
                     case NAME_SUBSECTION.FUNCTION:
-                        subSection.kind = "function";
                         subSection.value = reader.array(() => {
-                            const index = reader.vu32();
-                            const name = reader.string();
+                            const functionDef = {};
+                            
+                            functionDef.index = reader.vu32();
+                            functionDef.name = reader.string();
 
-                            return {
-                                index,
-                                name
-                            }
+                            return functionDef;
                         });
                         break;
                     case NAME_SUBSECTION.LOCAL:
-                        subSection.kind = "local";
-                        
                         subSection.value = reader.array(() => {
-                            const index = reader.vu32();
-                            const locals = reader.array(() => {
-                                const id = reader.vu32();
-                                const name = reader.string();
+                            const localsDef = {};
 
-                                return {
-                                    id,
-                                    name
-                                }
+                            localsDef.index = reader.vu32();
+                            localsDef.locals = reader.array(() => {
+                                const localDef = {};
+                                
+                                localDef.id = reader.vu32();
+                                localDef.name = reader.string();
+
+                                return localDef;
                             });
 
-                            return {
-                                index,
-                                locals
-                            }
+                            return localsDef;
+                        });
+                        break;
+                    case NAME_SUBSECTION.LABEL:
+                        subSection.raw = reader.byteArray(subSection.size);
+                        break;
+                    case NAME_SUBSECTION.TYPE:
+                    case NAME_SUBSECTION.TABLE:
+                    case NAME_SUBSECTION.MEMORY:
+                    case NAME_SUBSECTION.GLOBAL:
+                    case NAME_SUBSECTION.ELEMENT:
+                    case NAME_SUBSECTION.DATA:
+                        subSection.value = reader.array(() => {
+                            const def = {};
+                            
+                            def.index = reader.vu32();
+                            def.name = reader.string();
+                            
+                            return def;
                         });
                         break;
                     default:
-//                      return reader.reject("Invalid subsection", "custom:name");
-                        reader.at += subSection.size;
+                        subSection.raw = reader.byteArray(subSection.size);
                         break;
                 }
                 
                 nameData.push(subSection);
             }
 
-            return nameData
+            return nameData;
         }
         default:
             throw new Error("Unknown Custom Section")
