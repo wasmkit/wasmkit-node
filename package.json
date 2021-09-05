@@ -1,0 +1,22 @@
+{
+  "name": "wasm-parser",
+  "version": "1.0.0",
+  "description": "Reads and parses .wasm files",
+  "main": "parser.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awt-256/wasm-parser.git"
+  },
+  "keywords": [
+    "wasm"
+  ],
+  "author": "awt-256",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/awt-256/wasm-parser/issues"
+  },
+  "homepage": "https://github.com/awt-256/wasm-parser#readme"
+}
