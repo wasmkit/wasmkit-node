@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementSegmentMode = exports.SectionId = exports.Opstring = exports.Opcode = exports.ExternalType = exports.BlockType = exports.ValueType = exports.ReferenceType = exports.NumberType = void 0;
+exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementSegmentMode = exports.SectionId = exports.Opstring = exports.Opcode = exports.ExternalType = exports.BlockType = exports.ValueType = exports.ReferenceType = exports.NumberType = void 0;
 var NumberType;
 (function (NumberType) {
     NumberType[NumberType["I32"] = 127] = "I32";
@@ -21,7 +21,7 @@ var ValueType;
     ValueType[ValueType["F64"] = 124] = "F64";
     ValueType[ValueType["FunctionReference"] = 112] = "FunctionReference";
     ValueType[ValueType["ExternalReference"] = 111] = "ExternalReference";
-    ValueType[ValueType["Function"] = 112] = "Function";
+    ValueType[ValueType["Function"] = 96] = "Function";
 })(ValueType = exports.ValueType || (exports.ValueType = {}));
 var BlockType;
 (function (BlockType) {
@@ -35,10 +35,10 @@ var BlockType;
 })(BlockType = exports.BlockType || (exports.BlockType = {}));
 var ExternalType;
 (function (ExternalType) {
-    ExternalType[ExternalType["Function"] = 1] = "Function";
-    ExternalType[ExternalType["Table"] = 2] = "Table";
-    ExternalType[ExternalType["Memory"] = 3] = "Memory";
-    ExternalType[ExternalType["Global"] = 4] = "Global";
+    ExternalType[ExternalType["Function"] = 0] = "Function";
+    ExternalType[ExternalType["Table"] = 1] = "Table";
+    ExternalType[ExternalType["Memory"] = 2] = "Memory";
+    ExternalType[ExternalType["Global"] = 3] = "Global";
 })(ExternalType = exports.ExternalType || (exports.ExternalType = {}));
 var Opcode;
 (function (Opcode) {
@@ -562,7 +562,7 @@ class WasmReader {
         return out;
     }
     readFunctionType() {
-        this.assert(this.readByte() === 112, "Unsupported function type");
+        this.assert(this.readByte() === 96, "Unsupported function type");
         return {
             params: this.readVector(this.readByte),
             results: this.readVector(this.readByte)
@@ -712,7 +712,7 @@ class WasmReader {
                 immediates.value = this.readFloat64();
                 break;
             default:
-                throw new SyntaxError("Unsupported instruction");
+                this.assert(exports.Opstring.hasOwnProperty(opcode), "Unsupported instruction");
         }
         return {
             opcode,
@@ -749,7 +749,7 @@ class WasmReader {
         const name = this.readName();
         const type = this.readByte();
         switch (type) {
-            case 1:
+            case 0:
                 return {
                     module,
                     name,
@@ -758,21 +758,21 @@ class WasmReader {
                         typeIndex: this.readUint32()
                     }
                 };
-            case 2:
+            case 1:
                 return {
                     module,
                     name,
                     type,
                     description: this.readTableType()
                 };
-            case 3:
+            case 2:
                 return {
                     module,
                     name,
                     type,
                     description: this.readMemoryType()
                 };
-            case 4:
+            case 3:
                 return {
                     module,
                     name,
@@ -804,7 +804,7 @@ class WasmReader {
         const name = this.readName();
         const type = this.readByte();
         switch (type) {
-            case 1:
+            case 0:
                 return {
                     name,
                     type,
@@ -812,7 +812,7 @@ class WasmReader {
                         functionIndex: this.readUint32()
                     }
                 };
-            case 2:
+            case 1:
                 return {
                     name,
                     type,
@@ -820,7 +820,7 @@ class WasmReader {
                         tableIndex: this.readUint32()
                     }
                 };
-            case 3:
+            case 2:
                 return {
                     name,
                     type,
@@ -828,7 +828,7 @@ class WasmReader {
                         memoryIndex: this.readUint32()
                     }
                 };
-            case 4:
+            case 3:
                 return {
                     name,
                     type,
@@ -1034,4 +1034,5 @@ class WasmModule {
     }
 }
 exports.WasmModule = WasmModule;
+exports.WasmParser = WasmModule;
 //# sourceMappingURL=parser.js.map

@@ -46,7 +46,7 @@ export const enum ValueType {
 	FunctionReference = 0x70,
 	ExternalReference = 0x6F,
 
-	Function
+	Function = 0x60
 }
 
 export const enum BlockType {
@@ -62,10 +62,10 @@ export const enum BlockType {
 }
 
 export const enum ExternalType {
-	Function = 1,
-	Table = 2,
-	Memory = 3,
-	Global = 4
+	Function = 0,
+	Table = 1,
+	Memory = 2,
+	Global = 3
 }
 
 // §5.3.5
@@ -845,6 +845,7 @@ export class WasmReader {
 		if (opcodePrefixes.includes(opcode)) opcode = opcode << 8 | this.readUint32();
 
 		const immediates: Immediates = {};
+
 		switch (opcode) {
 			case Opcode.Block:
 			case Opcode.Loop:
@@ -958,7 +959,8 @@ export class WasmReader {
 				immediates.value = this.readFloat64();
 				break;
 			default:
-				throw new SyntaxError("Unsupported instruction")
+				this.assert(Opstring.hasOwnProperty(opcode),
+					"Unsupported instruction")
 		}
 
 		return {
@@ -1371,3 +1373,4 @@ export class WasmModule {
 		});
 	}
 }
+export const WasmParser = WasmModule;

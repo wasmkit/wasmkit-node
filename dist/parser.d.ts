@@ -15,7 +15,7 @@ export declare const enum ValueType {
     F64 = 124,
     FunctionReference = 112,
     ExternalReference = 111,
-    Function = 112
+    Function = 96
 }
 export declare const enum BlockType {
     I32 = 127,
@@ -27,10 +27,10 @@ export declare const enum BlockType {
     Void = 64
 }
 export declare const enum ExternalType {
-    Function = 1,
-    Table = 2,
-    Memory = 3,
-    Global = 4
+    Function = 0,
+    Table = 1,
+    Memory = 2,
+    Global = 3
 }
 export interface FunctionType {
     params: NumberType[];
@@ -435,3 +435,4 @@ export declare class WasmModule {
     private constructor();
     static decodeFrom(buffer: Uint8Array): WasmModule;
 }
+export declare const WasmParser: typeof WasmModule;
