@@ -36,16 +36,16 @@ export interface FunctionType {
     params: NumberType[];
     results: NumberType[];
 }
-export interface ResizableLimit {
+export interface ResizableLimits {
     min: number;
-    max: number;
+    max?: number;
 }
 export interface MemoryType {
-    limits: ResizableLimit;
+    limits: ResizableLimits;
 }
 export interface TableType {
     referenceType: ReferenceType;
-    limits: ResizableLimit;
+    limits: ResizableLimits;
 }
 export interface GlobalType {
     valueType: ValueType;
@@ -402,7 +402,7 @@ export declare class WasmReader {
     readByteVector(length?: number): Uint8Array;
     readVector<ElementType>(elementReadFunc: () => ElementType, length?: number): ElementType[];
     readFunctionType(): FunctionType;
-    readLimits(flags?: number): ResizableLimit;
+    readLimits(flags?: number): ResizableLimits;
     readMemoryType(): MemoryType;
     readTableType(): TableType;
     readGlobalType(): GlobalType;

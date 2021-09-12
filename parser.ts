@@ -75,19 +75,19 @@ export interface FunctionType {
 }
 
 // §5.3.6
-export interface ResizableLimit {
+export interface ResizableLimits {
 	min: number;
-	max: number;
+	max?: number;
 }
 
 // §5.3.7
 export interface MemoryType {
-	limits: ResizableLimit;
+	limits: ResizableLimits;
 }
 // §5.3.8
 export interface TableType {
 	referenceType: ReferenceType;
-	limits: ResizableLimit;
+	limits: ResizableLimits;
 }
 // §5.3.9
 export interface GlobalType {
@@ -800,14 +800,13 @@ export class WasmReader {
 	}
 
 	// §5.3.6
-	public readLimits(flags = this.readUint32()): ResizableLimit {
-		const limits = {
-			min: this.readUint32(),
-			max: -1 >>> 0
+	public readLimits(flags = this.readUint32()): ResizableLimits {
+		const limits: ResizableLimits = {
+			min: this.readUint32()
 		}
 		if (flags & 1) limits.max = this.readUint32()
 
-		this.assert(limits.max >= limits.min,
+		this.assert(typeof limits.max === 'undefined' || limits.max >= limits.min,
 			"Limits maximum must be greater than or equal to minimum :: module malformed")
 
 		return limits;

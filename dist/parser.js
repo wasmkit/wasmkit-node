@@ -570,12 +570,11 @@ class WasmReader {
     }
     readLimits(flags = this.readUint32()) {
         const limits = {
-            min: this.readUint32(),
-            max: -1 >>> 0
+            min: this.readUint32()
         };
         if (flags & 1)
             limits.max = this.readUint32();
-        this.assert(limits.max >= limits.min, "Limits maximum must be greater than or equal to minimum :: module malformed");
+        this.assert(typeof limits.max === 'undefined' || limits.max >= limits.min, "Limits maximum must be greater than or equal to minimum :: module malformed");
         return limits;
     }
     readMemoryType() {
