@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementSegmentMode = exports.SectionId = exports.Opstring = exports.Opcode = exports.ExternalType = exports.BlockType = exports.ValueType = exports.ReferenceType = exports.NumberType = void 0;
+exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementSegmentMode = exports.SectionId = exports.TerminatingEndInstruction = exports.Opstring = exports.Opcode = exports.ExternalType = exports.BlockType = exports.ValueType = exports.ReferenceType = exports.NumberType = void 0;
 var NumberType;
 (function (NumberType) {
     NumberType[NumberType["I32"] = 127] = "I32";
@@ -448,6 +448,11 @@ exports.Opstring = {
     64519: "i64.trunc_sat_f64_u",
 };
 const opcodePrefixes = [0xFC];
+exports.TerminatingEndInstruction = {
+    opcode: 11,
+    opstring: exports.Opstring[11],
+    immediates: {}
+};
 var SectionId;
 (function (SectionId) {
     SectionId[SectionId["Custom"] = 0] = "Custom";
@@ -724,9 +729,9 @@ class WasmReader {
         let depth = 0;
         while (true) {
             const instruction = this.readInstruction();
-            instructions.push(instruction);
             if (depth === 0 && instruction.opcode === 11)
                 break;
+            instructions.push(instruction);
             switch (instruction.opcode) {
                 case 11:
                     depth -= 1;
@@ -738,7 +743,7 @@ class WasmReader {
                     break;
             }
         }
-        return instructions;
+        return [...instructions, exports.TerminatingEndInstruction];
     }
     readTypeEntry() {
         return this.readFunctionType();
@@ -1003,6 +1008,7 @@ class WasmModule {
                     break;
                 case 10:
                     codeRaw = reader.readVector(reader.readCodeEntry);
+                    reader.assert(functionRaw && codeRaw.length === functionRaw.length, "For each function entry there should be a code entry, and vice versa :: module malformed");
                     break;
                 case 11:
                     dataRaw = reader.readVector(reader.readDataEntry);

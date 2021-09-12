@@ -587,10 +587,14 @@ export interface MemoryArgument {
 }
 
 // §5.4.8
-//
-// TODO:
-// With TS, force it to end with End instruction
-export type InstructionExpression = Instruction[];
+export type TerminatingEndInstruction = { opcode: Opcode.End } & Instruction;
+export const TerminatingEndInstruction: TerminatingEndInstruction = {
+	opcode: Opcode.End,
+	opstring: Opstring[Opcode.End],
+	immediates: {}
+};
+
+export type InstructionExpression = [...Instruction[], TerminatingEndInstruction];
 
 // $5.5.2
 export const enum SectionId {
@@ -971,13 +975,15 @@ export class WasmReader {
 
 	// §5.4.8
 	public readInstructionExpression(): InstructionExpression {
-		const instructions: InstructionExpression = [];
+		const instructions: Instruction[] = [];
 		let depth = 0;
 
 		while (true) {
 			const instruction = this.readInstruction();
-			instructions.push(instruction)
+
 			if (depth === 0 && instruction.opcode === Opcode.End) break;
+
+			instructions.push(instruction);
 
 			switch (instruction.opcode) {
 				case Opcode.End:
@@ -993,7 +999,7 @@ export class WasmReader {
 			}
 		}
 
-		return instructions
+		return [...instructions, TerminatingEndInstruction];
 	}
 	// §5.5.4
 	public readTypeEntry() {
@@ -1049,10 +1055,6 @@ export class WasmReader {
 		}
 	}
 
-	// TODO:
-	// Decide whether to simplify the following 2 methods (and others
-	// like them)? Or keep as is
-	//
 	// §5.5.7
 	public readTableEntry(): TableType {
 		return this.readTableType();
@@ -1336,9 +1338,9 @@ export class WasmModule {
 					break;
 				case SectionId.Code:
 					codeRaw = reader.readVector(reader.readCodeEntry);
-					// TODO:
-					// Not in the specification, though maybe assert that code
-					// entry count and function entry count are equal
+
+					reader.assert(functionRaw && codeRaw.length === functionRaw.length,
+						"For each function entry there should be a code entry, and vice versa :: module malformed");
 					break;
 				case SectionId.Data:
 					dataRaw = reader.readVector(reader.readDataEntry);

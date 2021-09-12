@@ -283,7 +283,11 @@ export interface MemoryArgument {
     offset: number;
     align: number;
 }
-export declare type InstructionExpression = Instruction[];
+export declare type TerminatingEndInstruction = {
+    opcode: Opcode.End;
+} & Instruction;
+export declare const TerminatingEndInstruction: TerminatingEndInstruction;
+export declare type InstructionExpression = [...Instruction[], TerminatingEndInstruction];
 export declare const enum SectionId {
     Custom = 0,
     Type = 1,
