@@ -1,6 +1,6 @@
 {
   "name": "wasm-parser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Parses and decodes wasm modules",
   "main": "parser.js",
   "scripts": {

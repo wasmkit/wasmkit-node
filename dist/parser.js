@@ -977,7 +977,7 @@ class WasmModule {
             }
             switch (id) {
                 case 0:
-                    reader.readByteVector();
+                    reader.at += size;
                     break;
                 case 1:
                     typeRaw = reader.readVector(reader.readTypeEntry);
@@ -1039,5 +1039,6 @@ class WasmModule {
     }
 }
 exports.WasmModule = WasmModule;
+WasmModule.VERSION = "v1.0.1";
 exports.WasmParser = WasmModule;
 //# sourceMappingURL=parser.js.map

@@ -303,9 +303,6 @@ export declare const enum SectionId {
     Data = 11,
     DataCount = 12
 }
-export interface FunctionDescription {
-    typeIndex: number;
-}
 export declare type ImportEntry = {
     module: string;
     name: string;
@@ -323,6 +320,9 @@ export declare type ImportEntry = {
     type: ExternalType.Global;
     description: GlobalType;
 });
+export interface FunctionDescription {
+    typeIndex: number;
+}
 export interface GlobalEntry {
     type: GlobalType;
     initialization: InstructionExpression;
@@ -426,6 +426,7 @@ export declare class WasmReader {
     assert(check: boolean, message: string): void;
 }
 export declare class WasmModule {
+    static readonly VERSION = "v1.0.1";
     readonly types: FunctionType[];
     readonly functions: WasmFunction[];
     readonly tables: TableType[];

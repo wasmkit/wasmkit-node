@@ -613,10 +613,6 @@ export const enum SectionId {
 	DataCount = 12
 }
 
-// §5.5.6
-export interface FunctionDescription {
-	typeIndex: number;
-}
 // §5.5.5
 export type ImportEntry = { module: string; name: string; type: ExternalType } &
 	({ type: ExternalType.Function, description: FunctionDescription } |
@@ -624,6 +620,10 @@ export type ImportEntry = { module: string; name: string; type: ExternalType } &
 	{ type: ExternalType.Memory, description: MemoryType } |
 	{ type: ExternalType.Global, description: GlobalType });
 
+// §5.5.6
+export interface FunctionDescription {
+	typeIndex: number;
+}
 // §5.5.9
 export interface GlobalEntry {
 	type: GlobalType,
@@ -1221,6 +1221,8 @@ export class WasmReader {
 }
 // §5.5.16
 export class WasmModule {
+	static readonly VERSION = "v1.0.1";
+
 	public readonly types: FunctionType[] = [];
 	public readonly functions: WasmFunction[] = [];
 	public readonly tables: TableType[] = [];
@@ -1307,7 +1309,7 @@ export class WasmModule {
 				case SectionId.Custom:
 					// TODO:
 					// Reimplement some custom section parsers
-					reader.readByteVector();
+					reader.at += size;
 					break;
 				case SectionId.Type:
 					typeRaw = reader.readVector(reader.readTypeEntry);
