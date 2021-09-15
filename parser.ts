@@ -24,41 +24,41 @@ SOFTWARE.
 
 // §5.3.1
 export const enum NumberType {
-    I32 = 0x7F,
-    I64 = 0x7E,
-    F32 = 0x7D,
-    F64 = 0x7C
+    I32 = -0x1,
+    I64 = -0x2,
+    F32 = -0x3,
+    F64 = -0x4
 }
 
 // §5.3.2
 export const enum ReferenceType {
-    FunctionReference = 0x70,
-    ExternalReference = 0x6F
+    FunctionReference = -0x10,
+    ExternalReference = -0x11
 }
 
 // §5.3.3
 export const enum ValueType {
-    I32 = 0x7F,
-    I64 = 0x7E,
-    F32 = 0x7D,
-    F64 = 0x7C,
+    I32 = -0x1,
+    I64 = -0x2,
+    F32 = -0x3,
+    F64 = -0x4,
 
-    FunctionReference = 0x70,
-    ExternalReference = 0x6F,
+    FunctionReference = -0x10,
+    ExternalReference = -0x11,
 
-    Function = 0x60
+    Function = -0x20
 }
 
 export const enum BlockType {
-    I32 = 0x7F,
-    I64 = 0x7E,
-    F32 = 0x7D,
-    F64 = 0x7C,
+    I32 = -0x1,
+    I64 = -0x2,
+    F32 = -0x3,
+    F64 = -0x4,
 
-    FunctionReference = 0x70,
-    ExternalReference = 0x6F,
+    FunctionReference = -0x10,
+    ExternalReference = -0x11,
 
-    Void = 0x40
+    Void = -0x40
 }
 
 export const enum ExternalType {
@@ -709,6 +709,9 @@ export class WasmReader {
     public readByte() {
         return this.buffer[this.at++];
     }
+    public readSignedByte() {
+        return (this.readByte() << 25) >> 25;
+    }
 
     // §5.2.2
     public readInt32() {
@@ -795,11 +798,11 @@ export class WasmReader {
 
     // §5.3.5
     public readFunctionType(): FunctionType {
-        this.assert(this.readByte() === ValueType.Function, "Unsupported function type");
+        this.assert(this.readSignedByte() === ValueType.Function, "Unsupported function type");
 
         return {
-            params: this.readVector(this.readByte),
-            results: this.readVector(this.readByte)
+            params: this.readVector(this.readSignedByte),
+            results: this.readVector(this.readSignedByte)
         }
     }
 
@@ -826,13 +829,13 @@ export class WasmReader {
     // §5.3.8
     public readTableType(): TableType {
         return {
-            referenceType: this.readByte(),
+            referenceType: this.readSignedByte(),
             limits: this.readLimits()
         }
     }
     // §5.3.9
     public readGlobalType(): GlobalType {
-        const valueType = this.readByte();
+        const valueType = this.readSignedByte();
         const flags = this.readUint32();
 
         return {
@@ -852,9 +855,12 @@ export class WasmReader {
         switch (opcode) {
             case Opcode.Block:
             case Opcode.Loop:
-            case Opcode.If:
-                immediates.valueType = this.readByte();
+            case Opcode.If: {
+                const type = this.readInt32();
+                if (type & 0x8000_0000) immediates.valueType = type;
+                else immediates.typeIndex = type;
                 break;
+            }
             case Opcode.Br:
             case Opcode.BrIf:
                 immediates.labelIndex = this.readUint32();
@@ -1172,7 +1178,7 @@ export class WasmReader {
         const start = this.at;
 
         const code: FunctionCode = {
-            locals: this.readVector(() => this.readVector<ValueType>(this.readByte)).flat(),
+            locals: this.readVector(() => this.readVector<ValueType>(this.readSignedByte)).flat(),
             functionBody: this.readInstructionExpression()
         }
 
@@ -1221,7 +1227,7 @@ export class WasmReader {
 }
 // §5.5.16
 export class WasmModule {
-    static readonly VERSION = "v1.0.1";
+    static readonly VERSION = "v1.0.3";
 
     public readonly types: FunctionType[] = [];
     public readonly functions: WasmFunction[] = [];

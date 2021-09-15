@@ -3,35 +3,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementSegmentMode = exports.SectionId = exports.TerminatingEndInstruction = exports.Opstring = exports.Opcode = exports.ExternalType = exports.BlockType = exports.ValueType = exports.ReferenceType = exports.NumberType = void 0;
 var NumberType;
 (function (NumberType) {
-    NumberType[NumberType["I32"] = 127] = "I32";
-    NumberType[NumberType["I64"] = 126] = "I64";
-    NumberType[NumberType["F32"] = 125] = "F32";
-    NumberType[NumberType["F64"] = 124] = "F64";
+    NumberType[NumberType["I32"] = -1] = "I32";
+    NumberType[NumberType["I64"] = -2] = "I64";
+    NumberType[NumberType["F32"] = -3] = "F32";
+    NumberType[NumberType["F64"] = -4] = "F64";
 })(NumberType = exports.NumberType || (exports.NumberType = {}));
 var ReferenceType;
 (function (ReferenceType) {
-    ReferenceType[ReferenceType["FunctionReference"] = 112] = "FunctionReference";
-    ReferenceType[ReferenceType["ExternalReference"] = 111] = "ExternalReference";
+    ReferenceType[ReferenceType["FunctionReference"] = -16] = "FunctionReference";
+    ReferenceType[ReferenceType["ExternalReference"] = -17] = "ExternalReference";
 })(ReferenceType = exports.ReferenceType || (exports.ReferenceType = {}));
 var ValueType;
 (function (ValueType) {
-    ValueType[ValueType["I32"] = 127] = "I32";
-    ValueType[ValueType["I64"] = 126] = "I64";
-    ValueType[ValueType["F32"] = 125] = "F32";
-    ValueType[ValueType["F64"] = 124] = "F64";
-    ValueType[ValueType["FunctionReference"] = 112] = "FunctionReference";
-    ValueType[ValueType["ExternalReference"] = 111] = "ExternalReference";
-    ValueType[ValueType["Function"] = 96] = "Function";
+    ValueType[ValueType["I32"] = -1] = "I32";
+    ValueType[ValueType["I64"] = -2] = "I64";
+    ValueType[ValueType["F32"] = -3] = "F32";
+    ValueType[ValueType["F64"] = -4] = "F64";
+    ValueType[ValueType["FunctionReference"] = -16] = "FunctionReference";
+    ValueType[ValueType["ExternalReference"] = -17] = "ExternalReference";
+    ValueType[ValueType["Function"] = -32] = "Function";
 })(ValueType = exports.ValueType || (exports.ValueType = {}));
 var BlockType;
 (function (BlockType) {
-    BlockType[BlockType["I32"] = 127] = "I32";
-    BlockType[BlockType["I64"] = 126] = "I64";
-    BlockType[BlockType["F32"] = 125] = "F32";
-    BlockType[BlockType["F64"] = 124] = "F64";
-    BlockType[BlockType["FunctionReference"] = 112] = "FunctionReference";
-    BlockType[BlockType["ExternalReference"] = 111] = "ExternalReference";
-    BlockType[BlockType["Void"] = 64] = "Void";
+    BlockType[BlockType["I32"] = -1] = "I32";
+    BlockType[BlockType["I64"] = -2] = "I64";
+    BlockType[BlockType["F32"] = -3] = "F32";
+    BlockType[BlockType["F64"] = -4] = "F64";
+    BlockType[BlockType["FunctionReference"] = -16] = "FunctionReference";
+    BlockType[BlockType["ExternalReference"] = -17] = "ExternalReference";
+    BlockType[BlockType["Void"] = -64] = "Void";
 })(BlockType = exports.BlockType || (exports.BlockType = {}));
 var ExternalType;
 (function (ExternalType) {
@@ -506,6 +506,9 @@ class WasmReader {
     readByte() {
         return this.buffer[this.at++];
     }
+    readSignedByte() {
+        return (this.readByte() << 25) >> 25;
+    }
     readInt32() {
         let i = 0;
         let out = 0;
@@ -567,10 +570,10 @@ class WasmReader {
         return out;
     }
     readFunctionType() {
-        this.assert(this.readByte() === 96, "Unsupported function type");
+        this.assert(this.readSignedByte() === -32, "Unsupported function type");
         return {
-            params: this.readVector(this.readByte),
-            results: this.readVector(this.readByte)
+            params: this.readVector(this.readSignedByte),
+            results: this.readVector(this.readSignedByte)
         };
     }
     readLimits(flags = this.readUint32()) {
@@ -589,12 +592,12 @@ class WasmReader {
     }
     readTableType() {
         return {
-            referenceType: this.readByte(),
+            referenceType: this.readSignedByte(),
             limits: this.readLimits()
         };
     }
     readGlobalType() {
-        const valueType = this.readByte();
+        const valueType = this.readSignedByte();
         const flags = this.readUint32();
         return {
             valueType,
@@ -609,9 +612,14 @@ class WasmReader {
         switch (opcode) {
             case 2:
             case 3:
-            case 4:
-                immediates.valueType = this.readByte();
+            case 4: {
+                const type = this.readInt32();
+                if (type & 2147483648)
+                    immediates.valueType = type;
+                else
+                    immediates.typeIndex = type;
                 break;
+            }
             case 12:
             case 13:
                 immediates.labelIndex = this.readUint32();
@@ -856,7 +864,7 @@ class WasmReader {
         const segment = {
             mode,
             tableIndex: 0,
-            type: 112
+            type: -16
         };
         if (modeFlags & 0b100) {
             const miniMode = modeFlags & 0b11;
@@ -877,7 +885,7 @@ class WasmReader {
             else {
                 const elementType = this.readByte();
                 this.assert(elementType === 0, "Unsupported table element type");
-                segment.type = 112;
+                segment.type = -16;
             }
             segment.initialization = this.readVector(this.readUint32);
         }
@@ -887,7 +895,7 @@ class WasmReader {
         const size = this.readUint32();
         const start = this.at;
         const code = {
-            locals: this.readVector(() => this.readVector(this.readByte)).flat(),
+            locals: this.readVector(() => this.readVector(this.readSignedByte)).flat(),
             functionBody: this.readInstructionExpression()
         };
         this.assert(this.at - start === size, "Size does not match function code's length :: module malformed");
@@ -1039,6 +1047,6 @@ class WasmModule {
     }
 }
 exports.WasmModule = WasmModule;
-WasmModule.VERSION = "v1.0.1";
+WasmModule.VERSION = "v1.0.3";
 exports.WasmParser = WasmModule;
 //# sourceMappingURL=parser.js.map

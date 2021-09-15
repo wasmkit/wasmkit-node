@@ -1,30 +1,30 @@
 export declare const enum NumberType {
-    I32 = 127,
-    I64 = 126,
-    F32 = 125,
-    F64 = 124
+    I32 = -1,
+    I64 = -2,
+    F32 = -3,
+    F64 = -4
 }
 export declare const enum ReferenceType {
-    FunctionReference = 112,
-    ExternalReference = 111
+    FunctionReference = -16,
+    ExternalReference = -17
 }
 export declare const enum ValueType {
-    I32 = 127,
-    I64 = 126,
-    F32 = 125,
-    F64 = 124,
-    FunctionReference = 112,
-    ExternalReference = 111,
-    Function = 96
+    I32 = -1,
+    I64 = -2,
+    F32 = -3,
+    F64 = -4,
+    FunctionReference = -16,
+    ExternalReference = -17,
+    Function = -32
 }
 export declare const enum BlockType {
-    I32 = 127,
-    I64 = 126,
-    F32 = 125,
-    F64 = 124,
-    FunctionReference = 112,
-    ExternalReference = 111,
-    Void = 64
+    I32 = -1,
+    I64 = -2,
+    F32 = -3,
+    F64 = -4,
+    FunctionReference = -16,
+    ExternalReference = -17,
+    Void = -64
 }
 export declare const enum ExternalType {
     Function = 0,
@@ -397,6 +397,7 @@ export declare class WasmReader {
     at: number;
     constructor(buffer: ArrayBuffer);
     readByte(): number;
+    readSignedByte(): number;
     readInt32(): number;
     readUint32(): number;
     readInt64(): bigint;
@@ -426,7 +427,7 @@ export declare class WasmReader {
     assert(check: boolean, message: string): void;
 }
 export declare class WasmModule {
-    static readonly VERSION = "v1.0.1";
+    static readonly VERSION = "v1.0.3";
     readonly types: FunctionType[];
     readonly functions: WasmFunction[];
     readonly tables: TableType[];
