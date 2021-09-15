@@ -4,8 +4,6 @@ Parses and decodes wasm modules
 
 ## Compiling
 ```
-npm install
-
 npm run build
 ```
 
