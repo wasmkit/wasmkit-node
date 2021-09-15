@@ -1,6 +1,6 @@
 const util = require('util');
 const WabtModule = require('./wabt');
-const { WasmParser } = require("../dist/parser");
+const { WasmParser } = require("../dist/commonjs/parser");
 
 WabtModule().then(function(wabt) {
     const text = `(module

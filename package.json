@@ -1,10 +1,12 @@
 {
-  "name": "wasm-parser",
+  "name": "@awt-256/wasm-parser",
   "version": "1.0.1",
   "description": "Parses and decodes wasm modules",
-  "main": "parser.js",
+  "main": "dist/commonjs/parser.js",
+  "types": "dist/commonjs/parser.d.ts",
+  "module": "dist/module/parser.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --outDir dist/commonjs && tsc --module es2015 --outDir dist/module",
     "examples": "node ./examples/simple"
   },
   "repository": {
