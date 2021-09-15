@@ -4,9 +4,8 @@
   "description": "Parses and decodes wasm modules",
   "main": "dist/commonjs/parser.js",
   "types": "dist/commonjs/parser.d.ts",
-  "module": "dist/module/parser.js",
   "scripts": {
-    "build": "tsc --outDir dist/commonjs && tsc --module es2015 --outDir dist/module",
+    "build": "tsc --outDir dist/commonjs",
     "examples": "node ./examples/simple"
   },
   "repository": {
