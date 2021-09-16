@@ -32,8 +32,8 @@ export declare const enum ExternalType {
     Global = 3
 }
 export interface FunctionType {
-    params: NumberType[];
-    results: NumberType[];
+    params: ValueType[];
+    results: ValueType[];
 }
 export interface ResizableLimits {
     min: number;

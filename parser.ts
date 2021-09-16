@@ -70,8 +70,8 @@ export const enum ExternalType {
 
 // §5.3.5
 export interface FunctionType {
-    params: NumberType[];
-    results: NumberType[];
+    params: ValueType[];
+    results: ValueType[];
 }
 
 // §5.3.6
