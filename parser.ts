@@ -46,7 +46,7 @@ export const enum ValueType {
     FunctionReference = -0x10,
     ExternalReference = -0x11,
 
-    Function = -0x20
+    // Function = -0x20
 }
 
 export const enum BlockType {
@@ -797,8 +797,11 @@ export class WasmReader {
     }
 
     // §5.3.5
+    //
+    // TODO:
+    // Keep strict byte reading? or implement in ValueType enum or other
     public readFunctionType(): FunctionType {
-        this.assert(this.readSignedByte() === ValueType.Function, "Unsupported function type");
+        this.assert(this.readByte() === 0x60, "Unsupported function type");
 
         return {
             params: this.readVector(this.readSignedByte),

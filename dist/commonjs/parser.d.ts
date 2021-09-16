@@ -14,8 +14,7 @@ export declare const enum ValueType {
     F32 = -3,
     F64 = -4,
     FunctionReference = -16,
-    ExternalReference = -17,
-    Function = -32
+    ExternalReference = -17
 }
 export declare const enum BlockType {
     I32 = -1,

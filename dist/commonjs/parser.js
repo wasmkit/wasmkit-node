@@ -21,7 +21,6 @@ var ValueType;
     ValueType[ValueType["F64"] = -4] = "F64";
     ValueType[ValueType["FunctionReference"] = -16] = "FunctionReference";
     ValueType[ValueType["ExternalReference"] = -17] = "ExternalReference";
-    ValueType[ValueType["Function"] = -32] = "Function";
 })(ValueType = exports.ValueType || (exports.ValueType = {}));
 var BlockType;
 (function (BlockType) {
@@ -570,7 +569,7 @@ class WasmReader {
         return out;
     }
     readFunctionType() {
-        this.assert(this.readSignedByte() === -32, "Unsupported function type");
+        this.assert(this.readByte() === 0x60, "Unsupported function type");
         return {
             params: this.readVector(this.readSignedByte),
             results: this.readVector(this.readSignedByte)
