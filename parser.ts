@@ -1181,7 +1181,7 @@ export class WasmReader {
         const start = this.at;
 
         const code: FunctionCode = {
-            locals: this.readVector(() => this.readVector<ValueType>(this.readSignedByte)).flat(),
+            locals: this.readVector(() => Array(this.readUint32()).fill(this.readSignedByte())).flat(),
             functionBody: this.readInstructionExpression()
         }
 

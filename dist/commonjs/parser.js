@@ -894,7 +894,7 @@ class WasmReader {
         const size = this.readUint32();
         const start = this.at;
         const code = {
-            locals: this.readVector(() => this.readVector(this.readSignedByte)).flat(),
+            locals: this.readVector(() => Array(this.readUint32()).fill(this.readSignedByte())).flat(),
             functionBody: this.readInstructionExpression()
         };
         this.assert(this.at - start === size, "Size does not match function code's length :: module malformed");
