@@ -644,10 +644,14 @@ export const enum ElementSegmentMode {
     Declarative = 2
 }
 
+export const enum ElementKind {
+    FunctionReference = 0x00
+}
+
 export interface ElementSegment {
     mode: ElementSegmentMode,
     tableIndex: number,
-    type: ReferenceType,
+    type: ReferenceType | ElementKind,
     initialization?: number[] | InstructionExpression[];
     offset?: InstructionExpression;
 }
@@ -1126,11 +1130,8 @@ export class WasmReader {
     }
 
     // §5.5.12
-    //
-    // TODO:
-    // Fix this (?)
     public readElementEntry(): ElementSegment {
-        const modeFlags = this.readByte();
+        const modeFlags = this.readByte() & 0b111;
 
         let mode;
         if ((modeFlags & 0b1) === 0) mode = ElementSegmentMode.Active;
@@ -1143,34 +1144,15 @@ export class WasmReader {
             type: ReferenceType.FunctionReference
         }
 
-        // TODO:
-        // Simplify this
-        if (modeFlags & 0b100) {
-            const miniMode = modeFlags & 0b11;
+        if ((modeFlags & 0b10) === 0b10) segment.tableIndex = this.readUint32();
+        if (mode === ElementSegmentMode.Active) segment.offset = this.readInstructionExpression();
 
-            if (miniMode === 0b10) segment.tableIndex = this.readUint32();
-            if ((miniMode & 0b1) === 0b0) segment.offset = this.readInstructionExpression();
-            if (miniMode !== 0b00) segment.type = this.readByte();
+        // Can either be as ElementKind or as ReferenceType
+        // TODO: Maybe check type? (Make sure its one of the 2 above)
+        if ((modeFlags & 0b11) !== 0) segment.type = this.readByte();
 
-            segment.initialization = this.readVector(this.readInstructionExpression);
-        } else {
-            const mode = modeFlags & 0b11;
-
-            if (mode === 0b10) segment.tableIndex = this.readUint32();
-            if ((mode & 0b1) === 0b0) segment.offset = this.readInstructionExpression();
-            else {
-                const elementType = this.readByte();
-
-                this.assert(elementType === 0,
-                    "Unsupported table element type");
-
-                // TODO:
-                // Make this not directly hardcoded, while still forcing function reference
-                segment.type = ReferenceType.FunctionReference;
-            }
-
-            segment.initialization = this.readVector(this.readUint32);
-        }
+        if ((modeFlags & 0b100) === 0) segment.initialization = this.readVector(this.readUint32);
+        else segment.initialization = this.readVector(this.readInstructionExpression);
 
         return segment;
     }
