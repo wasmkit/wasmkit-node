@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementSegmentMode = exports.SectionId = exports.TerminatingEndInstruction = exports.Opstring = exports.Opcode = exports.ExternalType = exports.BlockType = exports.ValueType = exports.ReferenceType = exports.NumberType = void 0;
+exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementKind = exports.ElementSegmentMode = exports.SectionId = exports.TerminatingEndInstruction = exports.Opstring = exports.Opcode = exports.ExternalType = exports.BlockType = exports.ValueType = exports.ReferenceType = exports.NumberType = void 0;
 var NumberType;
 (function (NumberType) {
     NumberType[NumberType["I32"] = -1] = "I32";
@@ -474,6 +474,10 @@ var ElementSegmentMode;
     ElementSegmentMode[ElementSegmentMode["Passive"] = 1] = "Passive";
     ElementSegmentMode[ElementSegmentMode["Declarative"] = 2] = "Declarative";
 })(ElementSegmentMode = exports.ElementSegmentMode || (exports.ElementSegmentMode = {}));
+var ElementKind;
+(function (ElementKind) {
+    ElementKind[ElementKind["FunctionReference"] = 0] = "FunctionReference";
+})(ElementKind = exports.ElementKind || (exports.ElementKind = {}));
 var DataSegmentMode;
 (function (DataSegmentMode) {
     DataSegmentMode[DataSegmentMode["Active"] = 0] = "Active";
@@ -852,7 +856,7 @@ class WasmReader {
         }
     }
     readElementEntry() {
-        const modeFlags = this.readByte();
+        const modeFlags = this.readByte() & 0b111;
         let mode;
         if ((modeFlags & 0b1) === 0)
             mode = 0;
@@ -865,29 +869,16 @@ class WasmReader {
             tableIndex: 0,
             type: -16
         };
-        if (modeFlags & 0b100) {
-            const miniMode = modeFlags & 0b11;
-            if (miniMode === 0b10)
-                segment.tableIndex = this.readUint32();
-            if ((miniMode & 0b1) === 0b0)
-                segment.offset = this.readInstructionExpression();
-            if (miniMode !== 0b00)
-                segment.type = this.readByte();
-            segment.initialization = this.readVector(this.readInstructionExpression);
-        }
-        else {
-            const mode = modeFlags & 0b11;
-            if (mode === 0b10)
-                segment.tableIndex = this.readUint32();
-            if ((mode & 0b1) === 0b0)
-                segment.offset = this.readInstructionExpression();
-            else {
-                const elementType = this.readByte();
-                this.assert(elementType === 0, "Unsupported table element type");
-                segment.type = -16;
-            }
+        if ((modeFlags & 0b10) === 0b10)
+            segment.tableIndex = this.readUint32();
+        if (mode === 0)
+            segment.offset = this.readInstructionExpression();
+        if ((modeFlags & 0b11) !== 0)
+            segment.type = this.readByte();
+        if ((modeFlags & 0b100) === 0)
             segment.initialization = this.readVector(this.readUint32);
-        }
+        else
+            segment.initialization = this.readVector(this.readInstructionExpression);
         return segment;
     }
     readCodeEntry() {

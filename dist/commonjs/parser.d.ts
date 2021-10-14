@@ -355,10 +355,13 @@ export declare const enum ElementSegmentMode {
     Passive = 1,
     Declarative = 2
 }
+export declare const enum ElementKind {
+    FunctionReference = 0
+}
 export interface ElementSegment {
     mode: ElementSegmentMode;
     tableIndex: number;
-    type: ReferenceType;
+    type: ReferenceType | ElementKind;
     initialization?: number[] | InstructionExpression[];
     offset?: InstructionExpression;
 }
