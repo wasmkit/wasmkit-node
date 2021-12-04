@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementKind = exports.ElementSegmentMode = exports.SectionId = exports.TerminatingEndInstruction = exports.Opstring = exports.Opcode = exports.ExternalType = exports.BlockType = exports.ValueType = exports.ReferenceType = exports.NumberType = void 0;
+exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementKind = exports.ElementSegmentMode = exports.SectionName = exports.SectionId = exports.TerminatingEndInstruction = exports.Opstring = exports.Opcode = exports.ExternalTypeString = exports.ExternalType = exports.BlockTypeString = exports.BlockType = exports.ValueTypeString = exports.ValueType = exports.ReferenceTypeString = exports.ReferenceType = exports.NumberTypeString = exports.NumberType = void 0;
 var NumberType;
 (function (NumberType) {
     NumberType[NumberType["I32"] = -1] = "I32";
@@ -8,11 +8,21 @@ var NumberType;
     NumberType[NumberType["F32"] = -3] = "F32";
     NumberType[NumberType["F64"] = -4] = "F64";
 })(NumberType = exports.NumberType || (exports.NumberType = {}));
+exports.NumberTypeString = {
+    [-1]: "i32",
+    [-2]: "i64",
+    [-3]: "f32",
+    [-4]: "f64"
+};
 var ReferenceType;
 (function (ReferenceType) {
     ReferenceType[ReferenceType["FunctionReference"] = -16] = "FunctionReference";
     ReferenceType[ReferenceType["ExternalReference"] = -17] = "ExternalReference";
 })(ReferenceType = exports.ReferenceType || (exports.ReferenceType = {}));
+exports.ReferenceTypeString = {
+    [-16]: "funcref",
+    [-17]: "externref"
+};
 var ValueType;
 (function (ValueType) {
     ValueType[ValueType["I32"] = -1] = "I32";
@@ -22,6 +32,14 @@ var ValueType;
     ValueType[ValueType["FunctionReference"] = -16] = "FunctionReference";
     ValueType[ValueType["ExternalReference"] = -17] = "ExternalReference";
 })(ValueType = exports.ValueType || (exports.ValueType = {}));
+exports.ValueTypeString = {
+    [-1]: exports.NumberTypeString[-1],
+    [-2]: exports.NumberTypeString[-2],
+    [-3]: exports.NumberTypeString[-3],
+    [-4]: exports.NumberTypeString[-4],
+    [-16]: exports.ReferenceTypeString[-16],
+    [-17]: exports.ReferenceTypeString[-17]
+};
 var BlockType;
 (function (BlockType) {
     BlockType[BlockType["I32"] = -1] = "I32";
@@ -32,6 +50,15 @@ var BlockType;
     BlockType[BlockType["ExternalReference"] = -17] = "ExternalReference";
     BlockType[BlockType["Void"] = -64] = "Void";
 })(BlockType = exports.BlockType || (exports.BlockType = {}));
+exports.BlockTypeString = {
+    [-1]: exports.NumberTypeString[-1],
+    [-2]: exports.NumberTypeString[-2],
+    [-3]: exports.NumberTypeString[-3],
+    [-4]: exports.NumberTypeString[-4],
+    [-16]: exports.ReferenceTypeString[-16],
+    [-17]: exports.ReferenceTypeString[-17],
+    [-64]: "void"
+};
 var ExternalType;
 (function (ExternalType) {
     ExternalType[ExternalType["Function"] = 0] = "Function";
@@ -39,6 +66,12 @@ var ExternalType;
     ExternalType[ExternalType["Memory"] = 2] = "Memory";
     ExternalType[ExternalType["Global"] = 3] = "Global";
 })(ExternalType = exports.ExternalType || (exports.ExternalType = {}));
+exports.ExternalTypeString = {
+    [0]: "function",
+    [1]: "table",
+    [2]: "memory",
+    [3]: "global"
+};
 var Opcode;
 (function (Opcode) {
     Opcode[Opcode["Unreachable"] = 0] = "Unreachable";
@@ -468,6 +501,21 @@ var SectionId;
     SectionId[SectionId["Data"] = 11] = "Data";
     SectionId[SectionId["DataCount"] = 12] = "DataCount";
 })(SectionId = exports.SectionId || (exports.SectionId = {}));
+exports.SectionName = {
+    [0]: "custom",
+    [1]: "type",
+    [2]: "import",
+    [3]: "function",
+    [4]: "table",
+    [5]: "memory",
+    [6]: "global",
+    [7]: "export",
+    [8]: "start",
+    [9]: "element",
+    [10]: "code",
+    [11]: "data",
+    [12]: "datacount"
+};
 var ElementSegmentMode;
 (function (ElementSegmentMode) {
     ElementSegmentMode[ElementSegmentMode["Active"] = 0] = "Active";

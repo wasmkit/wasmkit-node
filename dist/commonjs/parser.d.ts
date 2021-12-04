@@ -4,10 +4,12 @@ export declare const enum NumberType {
     F32 = -3,
     F64 = -4
 }
+export declare const NumberTypeString: Record<NumberType, string>;
 export declare const enum ReferenceType {
     FunctionReference = -16,
     ExternalReference = -17
 }
+export declare const ReferenceTypeString: Record<ReferenceType, string>;
 export declare const enum ValueType {
     I32 = -1,
     I64 = -2,
@@ -16,6 +18,7 @@ export declare const enum ValueType {
     FunctionReference = -16,
     ExternalReference = -17
 }
+export declare const ValueTypeString: Record<ValueType, string>;
 export declare const enum BlockType {
     I32 = -1,
     I64 = -2,
@@ -25,12 +28,14 @@ export declare const enum BlockType {
     ExternalReference = -17,
     Void = -64
 }
+export declare const BlockTypeString: Record<BlockType, string>;
 export declare const enum ExternalType {
     Function = 0,
     Table = 1,
     Memory = 2,
     Global = 3
 }
+export declare const ExternalTypeString: Record<ExternalType, string>;
 export interface FunctionType {
     params: ValueType[];
     results: ValueType[];
@@ -302,6 +307,7 @@ export declare const enum SectionId {
     Data = 11,
     DataCount = 12
 }
+export declare const SectionName: Record<SectionId, string>;
 export declare type ImportEntry = {
     module: string;
     name: string;
