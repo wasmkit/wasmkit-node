@@ -30,10 +30,22 @@ export const enum NumberType {
     F64 = -0x4
 }
 
+export const NumberTypeString: Record<NumberType, string> = {
+    [NumberType.I32]: "i32",
+    [NumberType.I64]: "i64",
+    [NumberType.F32]: "f32",
+    [NumberType.F64]: "f64"
+}
+
 // §5.3.2
 export const enum ReferenceType {
     FunctionReference = -0x10,
     ExternalReference = -0x11
+}
+
+export const ReferenceTypeString: Record<ReferenceType, string> = {
+    [ReferenceType.FunctionReference]: "funcref",
+    [ReferenceType.ExternalReference]: "externref"
 }
 
 // §5.3.3
@@ -49,6 +61,15 @@ export const enum ValueType {
     // Function = -0x20
 }
 
+export const ValueTypeString: Record<ValueType, string> = {
+    [ValueType.I32]: NumberTypeString[NumberType.I32],
+    [ValueType.I64]: NumberTypeString[NumberType.I64],
+    [ValueType.F32]: NumberTypeString[NumberType.F32],
+    [ValueType.F64]: NumberTypeString[NumberType.F64],
+    [ValueType.FunctionReference]: ReferenceTypeString[ReferenceType.FunctionReference],
+    [ValueType.ExternalReference]: ReferenceTypeString[ReferenceType.ExternalReference]
+}
+
 export const enum BlockType {
     I32 = -0x1,
     I64 = -0x2,
@@ -61,12 +82,30 @@ export const enum BlockType {
     Void = -0x40
 }
 
+export const BlockTypeString: Record<BlockType, string> = {
+    [BlockType.I32]: NumberTypeString[NumberType.I32],
+    [BlockType.I64]: NumberTypeString[NumberType.I64],
+    [BlockType.F32]: NumberTypeString[NumberType.F32],
+    [BlockType.F64]: NumberTypeString[NumberType.F64],
+    [BlockType.FunctionReference]: ReferenceTypeString[ReferenceType.FunctionReference],
+    [BlockType.ExternalReference]: ReferenceTypeString[ReferenceType.ExternalReference],
+    [BlockType.Void]: "void"
+}
+
 export const enum ExternalType {
     Function = 0,
     Table = 1,
     Memory = 2,
     Global = 3
 }
+
+export const ExternalTypeString: Record<ExternalType, string> = {
+    [ExternalType.Function]: "function",
+    [ExternalType.Table]: "table",
+    [ExternalType.Memory]: "memory",
+    [ExternalType.Global]: "global"
+}
+
 
 // §5.3.5
 export interface FunctionType {
@@ -613,6 +652,22 @@ export const enum SectionId {
     DataCount = 12
 }
 
+export const SectionName: Record<SectionId, string> = {
+    [SectionId.Custom]: "custom",
+    [SectionId.Type]: "type",
+    [SectionId.Import]: "import",
+    [SectionId.Function]: "function",
+    [SectionId.Table]: "table",
+    [SectionId.Memory]: "memory",
+    [SectionId.Global]: "global",
+    [SectionId.Export]: "export",
+    [SectionId.Start]: "start",
+    [SectionId.Element]: "element",
+    [SectionId.Code]: "code",
+    [SectionId.Data]: "data",
+    [SectionId.DataCount]: "datacount"
+}
+
 // §5.5.5
 export type ImportEntry = { module: string; name: string; type: ExternalType } &
     ({ type: ExternalType.Function, description: FunctionDescription } |
@@ -705,7 +760,7 @@ export class WasmReader {
     private buffer: Uint8Array;
     public at = 0;
 
-    constructor(buffer: ArrayBuffer) {
+    public constructor(buffer: ArrayBuffer) {
         this.buffer = new Uint8Array(buffer);
     }
 

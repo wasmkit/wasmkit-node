@@ -1,6 +1,6 @@
 {
   "name": "@wasmkit/wasm-parser",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Parses and decodes wasm modules",
   "main": "dist/commonjs/parser.js",
   "types": "dist/commonjs/parser.d.ts",
