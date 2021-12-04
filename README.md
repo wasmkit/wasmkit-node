@@ -5,7 +5,7 @@ Parses and decodes wasm modules
 ## Installation
 
 ```
-npm install @awt-256/wasm-parser
+npm install @wasmkit/wasm-parser
 ```
 
 ## Compiling
