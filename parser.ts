@@ -1267,7 +1267,7 @@ export class WasmReader {
 }
 // §5.5.16
 export class WasmModule {
-    static readonly VERSION = "v1.0.3";
+    static readonly VERSION = "v1.0.9";
 
     public readonly types: FunctionType[] = [];
     public readonly functions: WasmFunction[] = [];
