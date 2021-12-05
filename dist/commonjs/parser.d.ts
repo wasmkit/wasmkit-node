@@ -368,12 +368,12 @@ export interface ElementSegment {
     mode: ElementSegmentMode;
     tableIndex: number;
     type: ReferenceType | ElementKind;
-    initialization?: number[] | InstructionExpression[];
+    initialization: number[] | InstructionExpression[];
     offset?: InstructionExpression;
 }
 export interface FunctionCode {
     locals: ValueType[];
-    functionBody: InstructionExpression;
+    body: InstructionExpression;
 }
 export declare const enum DataSegmentMode {
     Active = 0,
@@ -435,7 +435,7 @@ export declare class WasmReader {
     assert(check: boolean, message: string): void;
 }
 export declare class WasmModule {
-    static readonly VERSION = "v1.0.3";
+    static readonly VERSION = "v1.0.9";
     readonly types: FunctionType[];
     readonly functions: WasmFunction[];
     readonly tables: TableType[];

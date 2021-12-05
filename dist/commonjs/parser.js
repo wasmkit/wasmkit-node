@@ -915,7 +915,8 @@ class WasmReader {
         const segment = {
             mode,
             tableIndex: 0,
-            type: -16
+            type: -16,
+            initialization: []
         };
         if ((modeFlags & 0b10) === 0b10)
             segment.tableIndex = this.readUint32();
@@ -934,7 +935,7 @@ class WasmReader {
         const start = this.at;
         const code = {
             locals: this.readVector(() => Array(this.readUint32()).fill(this.readSignedByte())).flat(),
-            functionBody: this.readInstructionExpression()
+            body: this.readInstructionExpression()
         };
         this.assert(this.at - start === size, "Size does not match function code's length :: module malformed");
         return code;
@@ -1070,7 +1071,7 @@ class WasmModule {
             types: typeRaw,
             functions: codeRaw.map((code, index) => ({
                 locals: code.locals,
-                body: code.functionBody,
+                body: code.body,
                 typeIndex: functionRaw[index].typeIndex
             })),
             tables: tableRaw,
@@ -1085,6 +1086,6 @@ class WasmModule {
     }
 }
 exports.WasmModule = WasmModule;
-WasmModule.VERSION = "v1.0.3";
+WasmModule.VERSION = "v1.0.9";
 exports.WasmParser = WasmModule;
 //# sourceMappingURL=parser.js.map

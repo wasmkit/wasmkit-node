@@ -707,14 +707,14 @@ export interface ElementSegment {
     mode: ElementSegmentMode,
     tableIndex: number,
     type: ReferenceType | ElementKind,
-    initialization?: number[] | InstructionExpression[];
+    initialization: number[] | InstructionExpression[];
     offset?: InstructionExpression;
 }
 
 // §5.5.13
 export interface FunctionCode {
     locals: ValueType[],
-    functionBody: InstructionExpression;
+    body: InstructionExpression;
 }
 
 // §5.5.14
@@ -1196,7 +1196,8 @@ export class WasmReader {
         const segment: ElementSegment = {
             mode,
             tableIndex: 0,
-            type: ReferenceType.FunctionReference
+            type: ReferenceType.FunctionReference,
+            initialization: []
         }
 
         if ((modeFlags & 0b10) === 0b10) segment.tableIndex = this.readUint32();
@@ -1219,7 +1220,7 @@ export class WasmReader {
 
         const code: FunctionCode = {
             locals: this.readVector(() => Array(this.readUint32()).fill(this.readSignedByte())).flat(),
-            functionBody: this.readInstructionExpression()
+            body: this.readInstructionExpression()
         }
 
         this.assert(this.at - start === size,
@@ -1267,8 +1268,6 @@ export class WasmReader {
 }
 // §5.5.16
 export class WasmModule {
-    static readonly VERSION = "v1.0.9";
-
     public readonly types: FunctionType[] = [];
     public readonly functions: WasmFunction[] = [];
     public readonly tables: TableType[] = [];
@@ -1408,7 +1407,7 @@ export class WasmModule {
             types: typeRaw,
             functions: codeRaw.map((code, index) => ({ 
                 locals: code.locals,
-                body: code.functionBody,
+                body: code.body,
                 typeIndex: functionRaw[index].typeIndex
             })),
             tables: tableRaw,
