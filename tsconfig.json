@@ -1,18 +1,16 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "target": "ES2021",
-      "outDir": "dist",
-
-      "noImplicitAny": true,
-      "removeComments": true,
-      "preserveConstEnums": true,
-      "sourceMap": true,
-      "declaration": true,
-
-      "strict": true,
-    },
-    "files": [
-      "parser.ts"
-    ]
-  }
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2021",
+    "outDir": "dist",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "declaration": true,
+    "strict": true,
+  },
+  "files": [
+    "parser.ts"
+  ]
+}
