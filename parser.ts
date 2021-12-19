@@ -42,6 +42,11 @@ export const enum VectorType {
     V128 = 0x7B
 }
 
+export const VectorTypeString: Record<VectorType, string> = {
+    [VectorType.V128]: "v128"
+}
+
+
 // §5.3.3
 export const enum ReferenceType {
     FunctionReference = -0x10,
@@ -1805,45 +1810,23 @@ export class WasmReader {
         if (!check) throw new SyntaxError(message);
     }
 }
+
 // §5.5.16
-export class WasmModule {
-    public readonly types: FunctionType[] = [];
-    public readonly functions: WasmFunction[] = [];
-    public readonly tables: TableType[] = [];
-    public readonly memories: MemoryType[] = [];
-    public readonly globals: GlobalEntry[] = [];
-    public readonly elements: ElementSegment[] = [];
-    public readonly datas: DataSegment[] = [];
-    public readonly start: number | null = null;
-    public readonly imports: ImportEntry[] = [];
-    public readonly exports: ExportEntry[] = [];
+export interface WasmModule {
+    readonly types: FunctionType[];
+    readonly functions: WasmFunction[];
+    readonly tables: TableType[];
+    readonly memories: MemoryType[];
+    readonly globals: GlobalEntry[];
+    readonly elements: ElementSegment[];
+    readonly datas: DataSegment[];
+    readonly start: number | null;
+    readonly imports: ImportEntry[];
+    readonly exports: ExportEntry[];
+}
 
-    private constructor(configuration: {
-        types: FunctionType[],
-        functions: WasmFunction[],
-        tables: TableType[],
-        memories: MemoryType[],
-        globals: GlobalEntry[],
-        elements: ElementSegment[],
-        datas: DataSegment[],
-        start: number | null,
-        imports: ImportEntry[],
-        exports: ExportEntry[],
-    }) {
-        this.types = configuration.types;
-        this.functions = configuration.functions;
-        this.tables = configuration.tables;
-        this.memories = configuration.memories;
-        this.globals = configuration.globals;
-        this.elements = configuration.elements;
-        this.datas = configuration.datas;
-        this.start = configuration.start;
-        this.imports = configuration.imports;
-        this.exports = configuration.exports;
-    }
-
-    // §5.5.16
-    static decodeFrom(buffer: Uint8Array) {
+export class WasmParser {
+    static parseModule(buffer: Uint8Array):  WasmModule {
         const reader = new WasmReader(buffer);
 
         reader.assert((reader.readByte() << 24 |
@@ -1942,7 +1925,7 @@ export class WasmModule {
                 "Size does not match section's length :: module malformed");
         }
 
-        return new WasmModule({
+        return {
             types: typeRaw,
             functions: codeRaw.map((code, index) => ({ 
                 locals: code.locals,
@@ -1957,7 +1940,6 @@ export class WasmModule {
             start: startRaw,
             imports: importRaw,
             exports: exportRaw
-        });
+        };
     }
 }
-export const WasmParser = WasmModule;

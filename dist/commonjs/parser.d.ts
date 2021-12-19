@@ -8,6 +8,7 @@ export declare const NumberTypeString: Record<NumberType, string>;
 export declare const enum VectorType {
     V128 = 123
 }
+export declare const VectorTypeString: Record<VectorType, string>;
 export declare const enum ReferenceType {
     FunctionReference = -16,
     ExternalReference = -17
@@ -677,7 +678,7 @@ export declare class WasmReader {
     inBuffer(): boolean;
     assert(check: boolean, message: string): void;
 }
-export declare class WasmModule {
+export interface WasmModule {
     readonly types: FunctionType[];
     readonly functions: WasmFunction[];
     readonly tables: TableType[];
@@ -688,7 +689,7 @@ export declare class WasmModule {
     readonly start: number | null;
     readonly imports: ImportEntry[];
     readonly exports: ExportEntry[];
-    private constructor();
-    static decodeFrom(buffer: Uint8Array): WasmModule;
 }
-export declare const WasmParser: typeof WasmModule;
+export declare class WasmParser {
+    static parseModule(buffer: Uint8Array): WasmModule;
+}

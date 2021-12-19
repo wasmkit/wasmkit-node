@@ -15,7 +15,7 @@ WabtModule().then(function(wabt) {
     const {buffer} = wat.toBinary({});
 
     try {
-        const wasmModule = WasmParser.decodeFrom(buffer);
+        const wasmModule = WasmParser.parseModule(buffer);
 
         console.log(file + "\n\n" + text + "\n\n");
         console.log(util.inspect(wasmModule, false, 27, true));

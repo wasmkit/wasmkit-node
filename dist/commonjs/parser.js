@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WasmParser = exports.WasmModule = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementKind = exports.ElementSegmentMode = exports.SectionName = exports.SectionId = exports.TerminatingEndInstruction = exports.Opstring = exports.Opcode = exports.ExternalTypeString = exports.ExternalType = exports.BlockTypeString = exports.BlockType = exports.ValueTypeString = exports.ValueType = exports.ReferenceTypeString = exports.ReferenceType = exports.VectorType = exports.NumberTypeString = exports.NumberType = void 0;
+exports.WasmParser = exports.WasmReader = exports.SectionOrder = exports.DataSegmentMode = exports.ElementKind = exports.ElementSegmentMode = exports.SectionName = exports.SectionId = exports.TerminatingEndInstruction = exports.Opstring = exports.Opcode = exports.ExternalTypeString = exports.ExternalType = exports.BlockTypeString = exports.BlockType = exports.ValueTypeString = exports.ValueType = exports.ReferenceTypeString = exports.ReferenceType = exports.VectorTypeString = exports.VectorType = exports.NumberTypeString = exports.NumberType = void 0;
 var NumberType;
 (function (NumberType) {
     NumberType[NumberType["I32"] = -1] = "I32";
@@ -18,6 +18,9 @@ var VectorType;
 (function (VectorType) {
     VectorType[VectorType["V128"] = 123] = "V128";
 })(VectorType = exports.VectorType || (exports.VectorType = {}));
+exports.VectorTypeString = {
+    [123]: "v128"
+};
 var ReferenceType;
 (function (ReferenceType) {
     ReferenceType[ReferenceType["FunctionReference"] = -16] = "FunctionReference";
@@ -1504,30 +1507,8 @@ class WasmReader {
     }
 }
 exports.WasmReader = WasmReader;
-class WasmModule {
-    constructor(configuration) {
-        this.types = [];
-        this.functions = [];
-        this.tables = [];
-        this.memories = [];
-        this.globals = [];
-        this.elements = [];
-        this.datas = [];
-        this.start = null;
-        this.imports = [];
-        this.exports = [];
-        this.types = configuration.types;
-        this.functions = configuration.functions;
-        this.tables = configuration.tables;
-        this.memories = configuration.memories;
-        this.globals = configuration.globals;
-        this.elements = configuration.elements;
-        this.datas = configuration.datas;
-        this.start = configuration.start;
-        this.imports = configuration.imports;
-        this.exports = configuration.exports;
-    }
-    static decodeFrom(buffer) {
+class WasmParser {
+    static parseModule(buffer) {
         const reader = new WasmReader(buffer);
         reader.assert((reader.readByte() << 24 |
             reader.readByte() << 16 |
@@ -1596,7 +1577,7 @@ class WasmModule {
             }
             reader.assert(reader.at - start === size, "Size does not match section's length :: module malformed");
         }
-        return new WasmModule({
+        return {
             types: typeRaw,
             functions: codeRaw.map((code, index) => ({
                 locals: code.locals,
@@ -1611,9 +1592,8 @@ class WasmModule {
             start: startRaw,
             imports: importRaw,
             exports: exportRaw
-        });
+        };
     }
 }
-exports.WasmModule = WasmModule;
-exports.WasmParser = WasmModule;
+exports.WasmParser = WasmParser;
 //# sourceMappingURL=parser.js.map
