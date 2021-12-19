@@ -1,3 +1,5 @@
+# UNSTABLE VERSION. EXPECT CODE-BREAKING CHANGES IN A FEW DAYS
+---
 # wasm-parser
 
 Parses and decodes wasm modules
