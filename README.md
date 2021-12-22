@@ -1,4 +1,4 @@
-# wasm-parser
+# wasmkit
 
 Web Assembly toolkit api for node javascript.
 
