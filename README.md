@@ -32,6 +32,6 @@ Spec compliant as of [Release 1.1 (2021-12-02)](https://webassembly.github.io/sp
 
 ## Looking for earlier versions? 
 
-- [`vALPHA`](https://github.com/wasmkit/wasm-parser/tree/archived-alpha)
-- [`vBETA`](https://github.com/wasmkit/wasm-parser/tree/archived-beta)
-- [`vGAMMA`](https://github.com/wasmkit/wasm-parser/tree/archived-gamma)
+- [`vALPHA`](https://github.com/wasmkit/wasmkit-node/tree/vALPHA-archive)
+- [`vBETA`](https://github.com/wasmkit/wasmkit-node/tree/vBETA-archive)
+- [`vGAMMA`](https://github.com/wasmkit/wasmkit-node/tree/vGAMMA-archive)
