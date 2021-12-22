@@ -5,34 +5,44 @@ export declare const enum NumberType {
     F64 = -4
 }
 export declare const NumberTypeString: Record<NumberType, string>;
+export declare const InverseNumberTypeString: Record<string, NumberType>;
 export declare const enum VectorType {
-    V128 = 123
+    V128 = -5
 }
 export declare const VectorTypeString: Record<VectorType, string>;
+export declare const InverseVectorTypeString: Record<string, VectorType>;
 export declare const enum ReferenceType {
     FunctionReference = -16,
     ExternalReference = -17
 }
 export declare const ReferenceTypeString: Record<ReferenceType, string>;
+export declare const HeapTypeString: Record<ReferenceType, string>;
+export declare const InverseReferenceTypeString: Record<string, ReferenceType>;
+export declare const InverseHeapTypeString: Record<string, ReferenceType>;
+export declare const LexInverseReferenceTypeString: Record<string, ReferenceType>;
 export declare const enum ValueType {
     I32 = -1,
     I64 = -2,
     F32 = -3,
     F64 = -4,
+    V128 = -5,
     FunctionReference = -16,
     ExternalReference = -17
 }
 export declare const ValueTypeString: Record<ValueType, string>;
+export declare const InverseValueTypeString: Record<string, ValueType>;
 export declare const enum BlockType {
     I32 = -1,
     I64 = -2,
     F32 = -3,
     F64 = -4,
+    V128 = -5,
     FunctionReference = -16,
     ExternalReference = -17,
     Void = -64
 }
 export declare const BlockTypeString: Record<BlockType, string>;
+export declare const InverseBlockTypeString: Record<string, BlockType>;
 export declare const enum ExternalType {
     Function = 0,
     Table = 1,
@@ -40,6 +50,7 @@ export declare const enum ExternalType {
     Global = 3
 }
 export declare const ExternalTypeString: Record<ExternalType, string>;
+export declare const InverseExternalTypeString: Record<string, ExternalType>;
 export interface FunctionType {
     params: ValueType[];
     results: ValueType[];
@@ -499,6 +510,8 @@ export declare const enum Opcode {
     F64x2PromoteLowF32x4 = 64863
 }
 export declare const Opstring: Record<Opcode, string>;
+export declare const InverseOpString: Record<string, Opcode>;
+export declare const OpcodePrefixes: number[];
 export interface Immediates {
     valueType?: ValueType;
     referenceType?: ReferenceType;
@@ -519,20 +532,19 @@ export interface Immediates {
     value?: number | bigint;
     laneIndex?: number;
     laneIndexs?: number[];
-    bytes?: Uint8Array | Int8Array;
+    bytes?: Uint8Array;
 }
 export interface Instruction {
     opcode: Opcode;
-    opstring: string;
     immediates: Immediates;
 }
 export interface MemoryArgument {
     offset: number;
     align: number;
 }
-export declare type TerminatingEndInstruction = {
+export interface TerminatingEndInstruction extends Instruction {
     opcode: Opcode.End;
-} & Instruction;
+}
 export declare const TerminatingEndInstruction: TerminatingEndInstruction;
 export declare type InstructionExpression = [...Instruction[], TerminatingEndInstruction];
 export declare const enum SectionId {
@@ -551,6 +563,7 @@ export declare const enum SectionId {
     DataCount = 12
 }
 export declare const SectionName: Record<SectionId, string>;
+export declare const InverseSectionName: Record<string, SectionId>;
 export declare type ImportEntry = {
     module: string;
     name: string;
@@ -604,9 +617,13 @@ export declare const enum ElementSegmentMode {
     Passive = 1,
     Declarative = 2
 }
+export declare const ElementSegmentModeString: Record<ElementSegmentMode, string>;
+export declare const InverseElementSegmentModeString: Record<string, ElementSegmentMode>;
 export declare const enum ElementKind {
     FunctionReference = 0
 }
+export declare const ElementKindString: Record<ElementKind, string>;
+export declare const InverseElementKindString: Record<string, ElementKind>;
 export interface ElementSegment {
     mode: ElementSegmentMode;
     tableIndex: number;
@@ -623,6 +640,8 @@ export declare const enum DataSegmentMode {
     Passive = 1,
     ActiveWithMemoryIndex = 2
 }
+export declare const DataSegmentModeString: Record<DataSegmentMode, string>;
+export declare const InverseDataSegmentModeString: Record<string, BlockType>;
 export declare type DataSegment = {
     mode: DataSegmentMode;
     initialization: Uint8Array;
@@ -643,41 +662,6 @@ export interface WasmFunction {
     locals: ValueType[];
     body: InstructionExpression;
 }
-export declare class WasmReader {
-    private buffer;
-    at: number;
-    constructor(buffer: ArrayBuffer);
-    readByte(): number;
-    readSignedByte(): number;
-    readInt32(): number;
-    readUint32(): number;
-    readInt64(): bigint;
-    readFloat32(): number;
-    readFloat64(): number;
-    readName(): string;
-    readByteVector(length?: number): Uint8Array;
-    readVector<ElementType>(elementReadFunc: () => ElementType, length?: number): ElementType[];
-    readFunctionType(): FunctionType;
-    readLimits(flags?: number): ResizableLimits;
-    readMemoryType(): MemoryType;
-    readTableType(): TableType;
-    readGlobalType(): GlobalType;
-    readMemoryArgument(): MemoryArgument;
-    readInstruction(): Instruction;
-    readInstructionExpression(): InstructionExpression;
-    readTypeEntry(): FunctionType;
-    readImportEntry(): ImportEntry;
-    readFunctionEntry(): FunctionDescription;
-    readTableEntry(): TableType;
-    readMemoryEntry(): MemoryType;
-    readGlobalEntry(): GlobalEntry;
-    readExportEntry(): ExportEntry;
-    readElementEntry(): ElementSegment;
-    readCodeEntry(): FunctionCode;
-    readDataEntry(): DataSegment;
-    inBuffer(): boolean;
-    assert(check: boolean, message: string): void;
-}
 export interface WasmModule {
     readonly types: FunctionType[];
     readonly functions: WasmFunction[];
@@ -690,6 +674,6 @@ export interface WasmModule {
     readonly imports: ImportEntry[];
     readonly exports: ExportEntry[];
 }
-export declare class WasmParser {
-    static parseModule(buffer: Uint8Array): WasmModule;
-}
+export declare const LexKeywords: string[];
+export declare const LexIntRegex: RegExp;
+export declare const LexFloatRegex: RegExp;

@@ -3,3 +3,4 @@ ext/
 node_modules/
 package-lock.json
 versions/
+src/parseString.ts

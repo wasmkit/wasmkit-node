@@ -1,27 +1,27 @@
 {
-  "name": "@wasmkit/wasm-parser",
-  "version": "1.3.2",
-  "description": "Parses and decodes wasm modules",
-  "main": "dist/commonjs/parser.js",
-  "types": "dist/commonjs/parser.d.ts",
-  "scripts": {
-    "build": "tsc --outDir dist/commonjs",
-    "examples": "node ./examples/simple"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wasmkit/wasm-parser.git"
-  },
-  "keywords": [
-    "wasm"
-  ],
-  "author": "wasmkit",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/wasmkit/wasm-parser/issues"
-  },
-  "homepage": "https://github.com/wasmkit/wasm-parser#readme",
-  "devDependencies": {
-    "typescript": "^4.4.2"
+    "name": "wasmkit",
+    "version": "1.1.2",
+    "description": "Web Assembly toolkit api for node javascript",
+    "scripts": {
+      "build": "tsc --outDir dist/commonjs",
+      "examples": "node ./examples/simple"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/wasmkit/wasmkit-node.git"
+    },
+    "keywords": [
+      "wasm"
+    ],
+    "author": "wasmkit",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/wasmkit/wasmkit-node/issues"
+    },
+    "homepage": "https://github.com/wasmkit/wasmkit-node#readme",
+    "devDependencies": {
+      "typescript": "^4.4.2"
+    },
+    "dependencies": {}
   }
-}
+  
