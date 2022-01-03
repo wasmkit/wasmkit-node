@@ -1309,6 +1309,7 @@ export interface WasmModule {
     readonly start: number | null;
     readonly imports: ImportEntry[];
     readonly exports: ExportEntry[];
+    readonly customSections: Record<string, Uint8Array[]>
     // readonly nameData: WasmNameData;
 }
 

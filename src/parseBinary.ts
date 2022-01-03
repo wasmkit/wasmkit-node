@@ -1,5 +1,3 @@
-
-
 /*
 MIT License
 
@@ -692,6 +690,7 @@ export const parseBinary = (buffer: Uint8Array): WasmModule => {
             "Size does not match section's length");
     }
     return {
+        customSections: {},
         types: typeRaw,
         functions: codeRaw.map((code, index) => ({ 
             locals: code.locals,
@@ -705,7 +704,6 @@ export const parseBinary = (buffer: Uint8Array): WasmModule => {
         datas: dataRaw,
         start: startRaw,
         imports: importRaw,
-        exports: exportRaw,
-        // nameData: {},
+        exports: exportRaw
     };
 }
