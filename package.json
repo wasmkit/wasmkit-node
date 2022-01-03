@@ -1,7 +1,9 @@
 {
     "name": "wasmkit",
-    "version": "1.1.4",
+    "version": "1.2.1",
     "description": "Web Assembly toolkit api for node javascript",
+    "main": "dist/commonjs/index.js",
+    "types": "dist/commonjs/index.d.ts",
     "scripts": {
       "build": "tsc --outDir dist/commonjs",
       "examples": "node ./examples/simple"

@@ -556,6 +556,7 @@ const parseBinary = (buffer) => {
         reader.assert(reader.at - start === size, "Size does not match section's length");
     }
     return {
+        customSections: {},
         types: typeRaw,
         functions: codeRaw.map((code, index) => ({
             locals: code.locals,
@@ -569,7 +570,7 @@ const parseBinary = (buffer) => {
         datas: dataRaw,
         start: startRaw,
         imports: importRaw,
-        exports: exportRaw,
+        exports: exportRaw
     };
 };
 exports.parseBinary = parseBinary;
