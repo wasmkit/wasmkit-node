@@ -628,7 +628,7 @@ function parseWASM(buffer, options=defaultOptions) {
         const id = reader.uint8();
 
         if (id !== SECTION.CUSTOM && lastSection >= id) return reader.reject(`Section 0x${id.toString(16).padStart(2, "0")} following 0x${lastSection.toString(16).padStart(2, "0")} out of order`);
-        lastSection = id;
+        if (id !== SECTION.DATACOUNT) lastSection = id;
 
         if (id > MAX_SECTION_ID) return reader.reject("Invalid section");
 
