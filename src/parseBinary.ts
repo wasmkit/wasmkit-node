@@ -400,10 +400,10 @@ class WasmReader {
     }
 
     // §5.5.3
-    public readCustomSubSection(): CustomSubSection {
+    public readCustomSubSection(end: number): CustomSubSection {
         return {
             name: this.readName(),
-            content: this.readByteVector(),
+            content: this.readByteVector(end - this.at),
         }
     }
 
@@ -651,7 +651,7 @@ export const parseBinary = (buffer: Uint8Array): WasmModule => {
         }
         switch (id) {
             case SectionId.Custom: 
-                customSections.push(reader.readCustomSubSection());
+                customSections.push(reader.readCustomSubSection(end));
                 break;
             case SectionId.Type:
                 typeRaw = reader.readVector(reader.readTypeEntry);
@@ -694,7 +694,7 @@ export const parseBinary = (buffer: Uint8Array): WasmModule => {
                 dataCount = reader.readUint32();
                 break;
         }
-        reader.assert(reader.at !== end,
+        reader.assert(reader.at === end,
             "Size does not match section's length");
     }
     return {

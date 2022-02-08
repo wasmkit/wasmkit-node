@@ -314,10 +314,10 @@ class WasmReader {
         }
         return [...instructions, const_1.TerminatingEndInstruction];
     }
-    readCustomSubSection() {
+    readCustomSubSection(end) {
         return {
             name: this.readName(),
-            content: this.readByteVector(),
+            content: this.readByteVector(end - this.at),
         };
     }
     readTypeEntry() {
@@ -518,7 +518,7 @@ const parseBinary = (buffer) => {
         }
         switch (id) {
             case 0:
-                customSections.push(reader.readCustomSubSection());
+                customSections.push(reader.readCustomSubSection(end));
                 break;
             case 1:
                 typeRaw = reader.readVector(reader.readTypeEntry);
@@ -559,7 +559,7 @@ const parseBinary = (buffer) => {
                 dataCount = reader.readUint32();
                 break;
         }
-        reader.assert(reader.at !== end, "Size does not match section's length");
+        reader.assert(reader.at === end, "Size does not match section's length");
     }
     return {
         customSections,
