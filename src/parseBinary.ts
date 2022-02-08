@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { FunctionType, ResizableLimits, MemoryType, TableType, GlobalType, MemoryArgument, Instruction, Opcode, Immediates, Opstring, InstructionExpression, TerminatingEndInstruction, ImportEntry, ExternalType, FunctionDescription, GlobalEntry, ExportEntry, ElementSegment, ElementSegmentMode, ReferenceType, FunctionCode, DataSegment, DataSegmentMode, SectionId, SectionOrder, WasmModule, OpcodePrefixes, ElementKindString, ReferenceTypeString, ElementKind } from "./const";
+import { FunctionType, ResizableLimits, MemoryType, TableType, GlobalType, MemoryArgument, Instruction, Opcode, Immediates, Opstring, InstructionExpression, TerminatingEndInstruction, ImportEntry, ExternalType, FunctionDescription, GlobalEntry, ExportEntry, ElementSegment, ElementSegmentMode, ReferenceType, FunctionCode, DataSegment, DataSegmentMode, SectionId, SectionOrder, WasmModule, OpcodePrefixes, ElementKindString, ReferenceTypeString, ElementKind, CustomSubSection } from "./const";
 
 const convo = new ArrayBuffer(8);
 const u8 = new Uint8Array(convo);
@@ -398,6 +398,15 @@ class WasmReader {
 
         return [...instructions, TerminatingEndInstruction];
     }
+
+    // §5.5.3
+    public readCustomSubSection(): CustomSubSection {
+        return {
+            name: this.readName(),
+            content: this.readByteVector(),
+        }
+    }
+
     // §5.5.4
     public readTypeEntry() {
         return this.readFunctionType();
@@ -622,13 +631,14 @@ export const parseBinary = (buffer: Uint8Array): WasmModule => {
         elementRaw: ElementSegment[] = [],
         dataCount: number | null = null,
         codeRaw: FunctionCode[] = [],
-        dataRaw: DataSegment[] = [];
+        dataRaw: DataSegment[] = [],
+        customSections: CustomSubSection[] = [];
     let orderPos = -1;
     
     while (reader.inBuffer()) {
         const id: SectionId = reader.readByte();
         const size = reader.readUint32();
-        const start = reader.at;
+        const end = reader.at + size;
         let newOrderPos = SectionOrder.indexOf(id);
         reader.assert(!SectionOrder.includes(id) || newOrderPos > orderPos,
             "Section " + id + " may not occur after " + SectionOrder[orderPos]);
@@ -640,10 +650,8 @@ export const parseBinary = (buffer: Uint8Array): WasmModule => {
             readSectionIds.push(id);
         }
         switch (id) {
-            case SectionId.Custom:
-                // TODO:
-                // Reimplement some custom section parsers
-                reader.at += size;
+            case SectionId.Custom: 
+                customSections.push(reader.readCustomSubSection());
                 break;
             case SectionId.Type:
                 typeRaw = reader.readVector(reader.readTypeEntry);
@@ -686,11 +694,11 @@ export const parseBinary = (buffer: Uint8Array): WasmModule => {
                 dataCount = reader.readUint32();
                 break;
         }
-        reader.assert(reader.at - start === size,
+        reader.assert(reader.at !== end,
             "Size does not match section's length");
     }
     return {
-        customSections: {},
+        customSections,
         types: typeRaw,
         functions: codeRaw.map((code, index) => ({ 
             locals: code.locals,

@@ -314,6 +314,12 @@ class WasmReader {
         }
         return [...instructions, const_1.TerminatingEndInstruction];
     }
+    readCustomSubSection() {
+        return {
+            name: this.readName(),
+            content: this.readByteVector(),
+        };
+    }
     readTypeEntry() {
         return this.readFunctionType();
     }
@@ -497,12 +503,12 @@ const parseBinary = (buffer) => {
         reader.readByte() << 16 |
         reader.readByte() << 24) === 1, 'Unknown version');
     const readSectionIds = [];
-    let typeRaw = [], importRaw = [], functionRaw = [], tableRaw = [], memoryRaw = [], globalRaw = [], exportRaw = [], startRaw = null, elementRaw = [], dataCount = null, codeRaw = [], dataRaw = [];
+    let typeRaw = [], importRaw = [], functionRaw = [], tableRaw = [], memoryRaw = [], globalRaw = [], exportRaw = [], startRaw = null, elementRaw = [], dataCount = null, codeRaw = [], dataRaw = [], customSections = [];
     let orderPos = -1;
     while (reader.inBuffer()) {
         const id = reader.readByte();
         const size = reader.readUint32();
-        const start = reader.at;
+        const end = reader.at + size;
         let newOrderPos = const_1.SectionOrder.indexOf(id);
         reader.assert(!const_1.SectionOrder.includes(id) || newOrderPos > orderPos, "Section " + id + " may not occur after " + const_1.SectionOrder[orderPos]);
         orderPos = newOrderPos;
@@ -512,7 +518,7 @@ const parseBinary = (buffer) => {
         }
         switch (id) {
             case 0:
-                reader.at += size;
+                customSections.push(reader.readCustomSubSection());
                 break;
             case 1:
                 typeRaw = reader.readVector(reader.readTypeEntry);
@@ -553,10 +559,10 @@ const parseBinary = (buffer) => {
                 dataCount = reader.readUint32();
                 break;
         }
-        reader.assert(reader.at - start === size, "Size does not match section's length");
+        reader.assert(reader.at !== end, "Size does not match section's length");
     }
     return {
-        customSections: {},
+        customSections,
         types: typeRaw,
         functions: codeRaw.map((code, index) => ({
             locals: code.locals,

@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { DataSegment, DataSegmentMode, ElementSegment, ElementSegmentMode, ExportEntry, ExternalType, FunctionCode, FunctionDescription, FunctionType, GlobalEntry, GlobalType, ImportEntry, Instruction, InstructionExpression, MemoryArgument, MemoryType, Opcode, Opstring, ResizableLimits, SectionId, TableType, ValueType, WasmModule } from "./const";
+import { CustomSubSection, DataSegment, DataSegmentMode, ElementSegment, ElementSegmentMode, ExportEntry, ExternalType, FunctionCode, FunctionDescription, FunctionType, GlobalEntry, GlobalType, ImportEntry, Instruction, InstructionExpression, MemoryArgument, MemoryType, Opcode, Opstring, ResizableLimits, SectionId, TableType, ValueType, WasmModule } from "./const";
 
 const convo = new ArrayBuffer(8);
 const u8 = new Uint8Array(convo);
@@ -504,6 +504,12 @@ class WasmWriter {
         }
     }
 
+    // §5.5.3
+    public writeCustomSubSection(custom: CustomSubSection) {
+        this.writeName(custom.name);
+        this.writeByteVector(custom.content);
+    }
+
     public hasSpace(amount = 0) {
         return this.size + amount < this.buffer.byteLength;
     }
@@ -552,6 +558,18 @@ export const buildBinary = (wasmModule: WasmModule) => {
     if (wasmModule.start !== null) builder.writeUint32(wasmModule.start);
     builder.buildSection(SectionId.Code, builder.writeCodeEntry, wasmModule.functions);
     builder.buildSection(SectionId.Data, builder.writeDataEntry, wasmModule.datas);
+    
+    // Eh, pile the rest at the end
+    if (wasmModule.customSections.length) {
+        for (let customs = wasmModule.customSections, i = 0; i < customs.length; ++i) {
+            const customRaw = new WasmWriter();
+            
+            customRaw.writeCustomSubSection(customs[i]);
+
+            builder.writeByte(SectionId.Custom);
+            builder.writeByteVector(customRaw.write());
+        }
+    }
 
     return builder.write();
 }

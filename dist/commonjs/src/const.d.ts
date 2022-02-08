@@ -662,6 +662,10 @@ export interface WasmFunction {
     locals: ValueType[];
     body: InstructionExpression;
 }
+export interface CustomSubSection {
+    name: string;
+    content: Uint8Array | number[];
+}
 export interface WasmModule {
     readonly types: FunctionType[];
     readonly functions: WasmFunction[];
@@ -673,7 +677,7 @@ export interface WasmModule {
     readonly start: number | null;
     readonly imports: ImportEntry[];
     readonly exports: ExportEntry[];
-    readonly customSections: Record<string, Uint8Array[]>;
+    readonly customSections: CustomSubSection[];
 }
 export declare const LexKeywords: string[];
 export declare const LexIntRegex: RegExp;

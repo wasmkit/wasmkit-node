@@ -420,6 +420,10 @@ class WasmWriter {
                 throw new SyntaxError("Unsupported data segment mode");
         }
     }
+    writeCustomSubSection(custom) {
+        this.writeName(custom.name);
+        this.writeByteVector(custom.content);
+    }
     hasSpace(amount = 0) {
         return this.size + amount < this.buffer.byteLength;
     }
@@ -465,6 +469,14 @@ const buildBinary = (wasmModule) => {
         builder.writeUint32(wasmModule.start);
     builder.buildSection(10, builder.writeCodeEntry, wasmModule.functions);
     builder.buildSection(11, builder.writeDataEntry, wasmModule.datas);
+    if (wasmModule.customSections.length) {
+        for (let customs = wasmModule.customSections, i = 0; i < customs.length; ++i) {
+            const customRaw = new WasmWriter();
+            customRaw.writeCustomSubSection(customs[i]);
+            builder.writeByte(0);
+            builder.writeByteVector(customRaw.write());
+        }
+    }
     return builder.write();
 };
 exports.buildBinary = buildBinary;
