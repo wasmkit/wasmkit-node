@@ -28,7 +28,7 @@ WebAssembly.validate(modifiedWasmBinary);
 ```
 
 ## Spec Compliancy
-Spec compliant as of [Release 1.1 (2021-01-28)](https://webassembly.github.io/spec/core/_download/WebAssembly.pdf)
+Spec compliant as of [Release 2.0 (2021-06-01)](https://webassembly.github.io/spec/core/_download/WebAssembly.pdf)
 
 ## Looking for earlier versions? 
 
